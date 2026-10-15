@@ -1,5 +1,7 @@
 # Investigación de Operaciones
 
+🌐 **Aplicación Web en Vivo (GitHub Pages):** [https://hayderfino.github.io/investigacion-operaciones-/](https://hayderfino.github.io/investigacion-operaciones-/)
+
 Repositorio con implementaciones y cuaderno interactivo para algoritmos fundamentales de **Investigación de Operaciones** y teoría de grafos:
 
 - **Algoritmo de Dijkstra**: Cálculo de la ruta más corta en grafos dirigidos y no dirigidos con pesos no negativos.
