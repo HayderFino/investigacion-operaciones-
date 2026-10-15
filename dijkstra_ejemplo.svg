@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <!-- Definitions for arrowheads -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="28" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="#f8f9fa" rx="10" />
+
+  <!-- Edges (Lines) -->
+  <line x1="100" y1="100" x2="100" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrow)" /> <!-- 0 -> 1 -->
+  <line x1="100" y1="100" x2="250" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrow)" /> <!-- 0 -> 2 -->
+  <line x1="100" y1="200" x2="250" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrow)" /> <!-- 1 -> 2 -->
+  
+  <!-- Edge Weights -->
+  <rect x="90" y="140" width="20" height="20" fill="white" rx="3" stroke="#ccc"/>
+  <text x="100" y="155" font-family="Arial" font-size="14" fill="red" text-anchor="middle">2</text>
+  
+  <rect x="165" y="105" width="20" height="20" fill="white" rx="3" stroke="#ccc"/>
+  <text x="175" y="120" font-family="Arial" font-size="14" fill="red" text-anchor="middle">1</text>
+
+  <rect x="165" y="175" width="20" height="20" fill="white" rx="3" stroke="#ccc"/>
+  <text x="175" y="190" font-family="Arial" font-size="14" fill="red" text-anchor="middle">3</text>
+
+  <!-- Nodes (Circles) -->
+  <circle cx="100" cy="100" r="20" fill="#4dabf7" stroke="#228be6" stroke-width="3" /> <!-- Node 0 -->
+  <circle cx="100" cy="200" r="20" fill="#ffc078" stroke="#f59f00" stroke-width="3" /> <!-- Node 1 -->
+  <circle cx="250" cy="150" r="20" fill="#69db7c" stroke="#40c057" stroke-width="3" /> <!-- Node 2 -->
+
+  <!-- Node Labels -->
+  <text x="100" y="105" font-family="Arial" font-weight="bold" font-size="16" fill="white" text-anchor="middle">0</text>
+  <text x="100" y="205" font-family="Arial" font-weight="bold" font-size="16" fill="white" text-anchor="middle">1</text>
+  <text x="250" y="155" font-family="Arial" font-weight="bold" font-size="16" fill="white" text-anchor="middle">2</text>
+
+  <!-- Shortest Path Distances annotations -->
+  <text x="50" y="90" font-family="Arial" font-size="12" fill="#555">Dist: 0</text>
+  <text x="50" y="220" font-family="Arial" font-size="12" fill="#555">Dist: 2</text>
+  <text x="280" y="155" font-family="Arial" font-size="12" fill="#555">Dist: 1</text>
+
+  <text x="200" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">Ejemplo Algoritmo de Dijkstra</text>
+</svg>

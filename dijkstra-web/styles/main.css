@@ -1,0 +1,372 @@
+:root {
+    --bg-paper: #F4EFE0;
+    --ink-dark: #1F2E5A;
+    --ink-red: #B3261E;
+    --ink-green: #2E6B4F;
+    --ink-ochre: #C98A1B;
+    
+    --font-serif: 'Fraunces', serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-hand: 'Caveat', cursive;
+}
+
+body {
+    background-color: var(--bg-paper);
+    color: var(--ink-dark);
+    font-family: var(--font-serif);
+    margin: 0;
+    padding: 20px;
+    background-image: 
+        linear-gradient(var(--bg-paper) 1px, transparent 1px),
+        linear-gradient(90deg, var(--bg-paper) 1px, transparent 1px),
+        linear-gradient(rgba(31, 46, 90, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 46, 90, 0.05) 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+}
+
+h1, h2, h3, h4 {
+    font-weight: 600;
+    margin-top: 0;
+}
+
+/* Algorithm Top Mode Switcher */
+.algo-mode-nav {
+    max-width: 1400px;
+    margin: 0 auto 1.5rem auto;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.mode-tab {
+    flex: 1;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    border: 3px solid var(--ink-dark);
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    box-shadow: 3px 3px 0 rgba(31, 46, 90, 0.15);
+}
+
+.mode-tab:hover {
+    background: rgba(31, 46, 90, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 rgba(31, 46, 90, 0.25);
+}
+
+.mode-tab.active {
+    background: var(--ink-dark);
+    color: white;
+    box-shadow: 4px 4px 0 var(--ink-ochre);
+}
+
+.mode-tab .mode-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.mode-tab .mode-title {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.mode-tab .mode-subtitle {
+    font-family: var(--font-hand);
+    font-size: 1.1rem;
+    opacity: 0.85;
+}
+
+.mode-tab.active .mode-subtitle {
+    color: #e5d8b8;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--ink-dark);
+    padding-bottom: 1rem;
+}
+
+.subtitle {
+    font-family: var(--font-hand);
+    font-size: 1.5rem;
+    color: var(--ink-dark);
+    opacity: 0.8;
+}
+
+/* Exercise Navigation and Statement Box */
+.exercise-selection-wrap {
+    max-width: 1400px;
+    margin: 0 auto 1.5rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.exercise-tabs {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.exercise-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.25rem;
+    border: 2px solid var(--ink-dark);
+    background: white;
+    cursor: pointer;
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.exercise-tab:hover {
+    background: rgba(31, 46, 90, 0.08);
+}
+
+.exercise-tab.active {
+    background: var(--ink-dark);
+    color: white;
+    box-shadow: 2px 2px 0 var(--ink-ochre);
+}
+
+.tab-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    border-radius: 3px;
+    background: rgba(31, 46, 90, 0.12);
+    color: var(--ink-dark);
+}
+
+.exercise-tab.active .tab-badge {
+    background: var(--ink-ochre);
+    color: var(--ink-dark);
+    font-weight: bold;
+}
+
+.exercise-statement-box {
+    border: 2px solid var(--ink-dark);
+    background: rgba(255, 255, 255, 0.85);
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    box-shadow: 3px 3px 0 rgba(31, 46, 90, 0.15);
+}
+
+.exercise-statement-box::before {
+    content: "LIBRO: HAMDY A. TAHA — INVESTIGACIÓN DE OPERACIONES";
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-ochre);
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.exercise-statement-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    margin: 0.2rem 0 0.5rem 0;
+    color: var(--ink-dark);
+}
+
+.exercise-statement-desc {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin: 0 0 1rem 0;
+    color: #222;
+}
+
+.exercise-statement-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--bg-paper);
+    border: 1px solid var(--ink-dark);
+    padding: 0.25rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+.meta-pill strong {
+    color: var(--ink-red);
+}
+
+main {
+    display: flex;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    border-left: 1px dashed var(--ink-dark);
+    padding-left: 2rem;
+}
+
+/* SVG Graph */
+.graph-container {
+    border: 2px solid var(--ink-dark);
+    background-color: rgba(255, 255, 255, 0.5);
+    background-image: 
+        linear-gradient(rgba(31, 46, 90, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 46, 90, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Formula Box */
+.formula-box {
+    border: 3px double var(--ink-dark);
+    padding: 1rem;
+    background-color: var(--bg-paper);
+}
+
+.math-eq {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.explanation {
+    font-size: 0.95rem;
+    list-style-type: square;
+    margin-bottom: 0;
+}
+
+.explanation li {
+    margin-bottom: 0.3rem;
+}
+
+/* Iterations */
+.iteration-block {
+    border-bottom: 1px solid rgba(31, 46, 90, 0.3);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.equation-row {
+    margin-left: 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--ink-ochre);
+    margin-bottom: 1rem;
+}
+
+.tie-breaker-note {
+    font-family: var(--font-hand);
+    color: var(--ink-red);
+    font-size: 1.2rem;
+}
+
+/* Tables */
+.dijkstra-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    background: white;
+}
+
+.dijkstra-table th, .dijkstra-table td {
+    border: 1px solid var(--ink-dark);
+    padding: 0.5rem;
+    text-align: right;
+}
+
+.dijkstra-table th {
+    font-family: var(--font-serif);
+    font-variant: small-caps;
+    background-color: rgba(31, 46, 90, 0.1);
+}
+
+.permanent {
+    font-weight: bold;
+    color: var(--ink-green);
+    text-decoration: underline;
+}
+
+.provisional {
+    color: var(--ink-ochre);
+}
+
+/* Controls */
+.config-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+input, select, button {
+    font-family: var(--font-mono);
+    border: 1px solid var(--ink-dark);
+    background: white;
+    padding: 0.4rem;
+    color: var(--ink-dark);
+}
+
+button {
+    cursor: pointer;
+    font-family: var(--font-serif);
+    font-weight: bold;
+    transition: background 0.2s, color 0.2s;
+}
+
+button:hover {
+    background: var(--ink-dark);
+    color: white;
+}
+
+button.primary {
+    background: var(--ink-dark);
+    color: white;
+}
+
+button.primary:hover {
+    background: var(--ink-ochre);
+    color: var(--ink-dark);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    main {
+        flex-direction: column;
+    }
+    .right-panel {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px dashed var(--ink-dark);
+        padding-top: 2rem;
+    }
+}
