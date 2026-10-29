@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicios Parcial — Investigación de Operaciones</title>
+    <meta name="description" content="Solución completa de dos ejercicios de Investigación de Operaciones: Red de Fibra Óptica (Kruskal) y Enrutamiento de Mínima Latencia (Dijkstra).">
+    <link rel="icon" href="data:,">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="vendor/katex/dist/katex.min.css">
+    <script defer src="vendor/katex/dist/katex.min.js"></script>
+    <script defer src="vendor/katex/dist/contrib/auto-render.min.js"></script>
+
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/ejercicios.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="ejercicios-top-nav">
+        <a href="./" class="back-link">← Volver al cuaderno interactivo</a>
+        <h1 class="nav-title">📝 Ejercicios — Parcial de Investigación de Operaciones</h1>
+    </nav>
+
+    <!-- Problem selector tabs -->
+    <div class="problem-tabs-container">
+        <button type="button" class="problem-tab active" id="tab-prob1" data-prob="1">
+            <span class="prob-icon">🌐</span>
+            <span class="prob-label">Problema 1</span>
+            <span class="prob-name">Red de Fibra Óptica (Kruskal)</span>
+        </button>
+        <button type="button" class="problem-tab" id="tab-prob2" data-prob="2">
+            <span class="prob-icon">⚡</span>
+            <span class="prob-label">Problema 2</span>
+            <span class="prob-name">Enrutamiento de Latencia (Dijkstra)</span>
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  PROBLEMA 1: RED DE FIBRA ÓPTICA (KRUSKAL)                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="problem-panel" id="panel-prob1">
+        <header class="problem-header">
+            <div class="problem-number">Problema 1</div>
+            <h2>Red de Fibra Óptica</h2>
+            <p class="problem-statement">
+                Se tienen seis sedes: <strong>A, B, C, D, E y F</strong>. Se busca conectarlas todas con el menor costo posible utilizando un <em>Árbol de Expansión Mínima (AEM)</em>.
+                El costo por kilómetro es de <strong>$18.000.000 COP</strong> y cada sede debe quedar conectada.
+            </p>
+            <div class="meta-strip">
+                <span class="meta-pill"><strong>Algoritmo:</strong> Kruskal</span>
+                <span class="meta-pill"><strong>Sedes:</strong> 6 (A–F)</span>
+                <span class="meta-pill"><strong>Costo/km:</strong> $18.000.000 COP</span>
+                <span class="meta-pill"><strong>Objetivo:</strong> AEM de costo mínimo</span>
+            </div>
+        </header>
+
+        <!-- SVG Graph for Problem 1 -->
+        <section class="graph-section">
+            <h3 class="section-title"><span class="section-icon">📊</span> Grafo de la Red</h3>
+            <div class="graph-container">
+                <svg id="graph-p1" width="100%" height="480" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+            <div class="graph-legend">
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-green)"></span> Arista en el AEM</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-red); opacity:0.5"></span> Arista descartada</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-dark); opacity:0.3"></span> Arista no evaluada</span>
+            </div>
+        </section>
+
+        <!-- ═══ Parte a) ═══ -->
+        <section class="part-section" id="p1a">
+            <div class="part-header">
+                <span class="part-badge">a</span>
+                <h3>Hallar el árbol de expansión mínima con Kruskal</h3>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">Paso 1</span> Ordenar los enlaces de menor a mayor distancia</h4>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Orden</th><th>Enlace</th><th>Distancia (km)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>A–B</td><td>14</td></tr>
+                        <tr><td>2</td><td>B–F</td><td>20</td></tr>
+                        <tr><td>3</td><td>A–C</td><td>22</td></tr>
+                        <tr><td>4</td><td>A–D</td><td>25</td></tr>
+                        <tr><td>5</td><td>C–F</td><td>27</td></tr>
+                        <tr><td>6</td><td>D–E</td><td>28</td></tr>
+                        <tr><td>7</td><td>B–C</td><td>30</td></tr>
+                        <tr><td>8</td><td>C–D</td><td>35</td></tr>
+                        <tr><td>9</td><td>E–F</td><td>38</td></tr>
+                        <tr><td>10</td><td>A–E</td><td>40</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">Paso 2</span> Seleccionar enlaces sin formar ciclos</h4>
+                <p class="note-box">Como existen seis sedes, el árbol mínimo debe tener exactamente <span class="katex-inline" data-latex="6-1=5"></span> enlaces.</p>
+                <table class="dijkstra-table iteration-table">
+                    <thead>
+                        <tr><th>Iteración</th><th>Enlace evaluado</th><th>Decisión</th><th>Motivo</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="row-accepted"><td>1</td><td>A–B (14)</td><td class="permanent">✔ Aceptar</td><td>Conecta A y B</td></tr>
+                        <tr class="row-accepted"><td>2</td><td>B–F (20)</td><td class="permanent">✔ Aceptar</td><td>Incorpora F</td></tr>
+                        <tr class="row-accepted"><td>3</td><td>A–C (22)</td><td class="permanent">✔ Aceptar</td><td>Incorpora C</td></tr>
+                        <tr class="row-accepted"><td>4</td><td>A–D (25)</td><td class="permanent">✔ Aceptar</td><td>Incorpora D</td></tr>
+                        <tr class="row-rejected"><td>5</td><td>C–F (27)</td><td class="tie-breaker-note">✖ Rechazar</td><td>Forma un ciclo C–A–B–F–C</td></tr>
+                        <tr class="row-accepted"><td>6</td><td>D–E (28)</td><td class="permanent">✔ Aceptar</td><td>Incorpora E y conecta todas las sedes</td></tr>
+                    </tbody>
+                </table>
+                <div class="tree-result">
+                    <strong>El árbol queda formado por:</strong> A–B, B–F, A–C, A–D y D–E.
+                </div>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">Paso 3</span> Calcular la distancia y el costo total</h4>
+                <div class="math-display" data-latex="D = 14 + 20 + 22 + 25 + 28 = 109 \text{ km}"></div>
+                <p>Como cada kilómetro cuesta $18.000.000 COP:</p>
+                <div class="math-display" data-latex="C = 109 \times 18{,}000{,}000"></div>
+                <div class="result-box">
+                    <div class="math-display" data-latex="\boxed{C = \$1.962.000.000 \text{ COP}}"></div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Respuesta a)</div>
+                <p>El árbol de expansión mínima tiene <strong>109 km</strong> de fibra óptica y un costo total de <strong>$1.962.000.000 COP</strong>.</p>
+            </div>
+        </section>
+
+        <!-- ═══ Parte b) ═══ -->
+        <section class="part-section" id="p1b">
+            <div class="part-header">
+                <span class="part-badge">b</span>
+                <h3>Recalcular el árbol cuando no se puede construir A–D</h3>
+            </div>
+
+            <p>Se elimina el enlace <strong>A–D</strong> de 25 km y se aplica nuevamente Kruskal.</p>
+
+            <!-- SVG Graph for Part b -->
+            <div class="graph-container mini-graph">
+                <svg id="graph-p1b" width="100%" height="400" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+
+            <table class="dijkstra-table iteration-table">
+                <thead>
+                    <tr><th>Iteración</th><th>Enlace</th><th>Decisión</th><th>Motivo</th></tr>
+                </thead>
+                <tbody>
+                    <tr class="row-accepted"><td>1</td><td>A–B (14)</td><td class="permanent">✔ Aceptar</td><td>Conecta A y B</td></tr>
+                    <tr class="row-accepted"><td>2</td><td>B–F (20)</td><td class="permanent">✔ Aceptar</td><td>Incorpora F</td></tr>
+                    <tr class="row-accepted"><td>3</td><td>A–C (22)</td><td class="permanent">✔ Aceptar</td><td>Incorpora C</td></tr>
+                    <tr class="row-rejected"><td>4</td><td>C–F (27)</td><td class="tie-breaker-note">✖ Rechazar</td><td>Forma un ciclo</td></tr>
+                    <tr class="row-accepted"><td>5</td><td>D–E (28)</td><td class="permanent">✔ Aceptar</td><td>Conecta D y E</td></tr>
+                    <tr class="row-rejected"><td>6</td><td>B–C (30)</td><td class="tie-breaker-note">✖ Rechazar</td><td>Forma un ciclo</td></tr>
+                    <tr class="row-accepted"><td>7</td><td>C–D (35)</td><td class="permanent">✔ Aceptar</td><td>Une ambos componentes</td></tr>
+                </tbody>
+            </table>
+
+            <div class="step-block">
+                <p><strong>Enlaces seleccionados:</strong> A–B, B–F, A–C, D–E y C–D.</p>
+                <div class="math-display" data-latex="D' = 14 + 20 + 22 + 28 + 35 = 119 \text{ km}"></div>
+                <div class="math-display" data-latex="C' = 119 \times 18{,}000{,}000"></div>
+                <div class="result-box">
+                    <div class="math-display" data-latex="\boxed{C' = \$2.142.000.000 \text{ COP}}"></div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <h4>Cálculo del sobrecosto</h4>
+                <div class="math-display" data-latex="\Delta C = C' - C = 2{,}142{,}000{,}000 - 1{,}962{,}000{,}000"></div>
+                <div class="result-box warning">
+                    <div class="math-display" data-latex="\boxed{\Delta C = \$180.000.000 \text{ COP}}"></div>
+                </div>
+                <div class="math-display" data-latex="\text{Incremento porcentual} = \frac{180{,}000{,}000}{1{,}962{,}000{,}000} \times 100 \approx 9{,}17\%"></div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Respuesta b)</div>
+                <p>Al no poder construir A–D, el costo aumenta en <strong>$180.000.000 COP</strong>, equivalente aproximadamente al <strong>9,17%</strong>. Se debe construir un enlace más largo para conectar las sedes D y E con el resto de la red.</p>
+            </div>
+        </section>
+
+        <!-- ═══ Parte c) ═══ -->
+        <section class="part-section" id="p1c">
+            <div class="part-header">
+                <span class="part-badge">c</span>
+                <h3>Proponer un enlace adicional para obtener redundancia</h3>
+            </div>
+
+            <p>Se propone agregar el enlace <strong>C–F</strong>, de 27 km, que no pertenece al árbol original.</p>
+
+            <div class="step-block">
+                <div class="math-display" data-latex="C_r = 27 \times 18{,}000{,}000"></div>
+                <div class="result-box">
+                    <div class="math-display" data-latex="\boxed{C_r = \$486.000.000 \text{ COP}}"></div>
+                </div>
+            </div>
+
+            <div class="redundancy-box">
+                <h4>🔄 Análisis de rutas alternativas</h4>
+                <div class="route-comparison">
+                    <div class="route-card primary-route">
+                        <div class="route-label">Ruta principal</div>
+                        <div class="route-path">B → F</div>
+                        <div class="route-detail">Directa (20 km)</div>
+                    </div>
+                    <div class="route-vs">VS</div>
+                    <div class="route-card alt-route">
+                        <div class="route-label">Ruta alternativa</div>
+                        <div class="route-path">B → A → C → F</div>
+                        <div class="route-detail"><span class="katex-inline" data-latex="14 + 22 + 27 = 63"></span> km</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Conclusión</div>
+                <p>El enlace adicional mejora la disponibilidad y permite recuperarse ante una falla, aunque aumenta la inversión en <strong>$486.000.000 COP</strong>. Su conveniencia depende de la importancia de mantener conectadas las sedes y del presupuesto disponible.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  PROBLEMA 2: ENRUTAMIENTO DE MÍNIMA LATENCIA (DIJKSTRA)       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="problem-panel" id="panel-prob2" style="display:none;">
+        <header class="problem-header">
+            <div class="problem-number">Problema 2</div>
+            <h2>Enrutamiento de Mínima Latencia</h2>
+            <p class="problem-statement">
+                Se desea encontrar la ruta de menor latencia entre el servidor <strong>S</strong> y el cliente <strong>T</strong>, utilizando el <em>Algoritmo de Dijkstra</em>.
+            </p>
+            <div class="meta-strip">
+                <span class="meta-pill"><strong>Algoritmo:</strong> Dijkstra</span>
+                <span class="meta-pill"><strong>Origen:</strong> Servidor S</span>
+                <span class="meta-pill"><strong>Destino:</strong> Cliente T</span>
+                <span class="meta-pill"><strong>Enlaces:</strong> Bidireccionales</span>
+            </div>
+        </header>
+
+        <!-- SVG Graph for Problem 2 -->
+        <section class="graph-section">
+            <h3 class="section-title"><span class="section-icon">📊</span> Grafo de la Red</h3>
+            <div class="graph-container">
+                <svg id="graph-p2" width="100%" height="480" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+            <div class="graph-legend">
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-green)"></span> Ruta óptima 1</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-ochre)"></span> Ruta óptima 2</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-dark); opacity:0.3"></span> Enlace no utilizado</span>
+            </div>
+
+            <div class="edges-table-wrap">
+                <h4>Tabla de enlaces del grafo</h4>
+                <table class="dijkstra-table">
+                    <thead><tr><th>Enlace</th><th>Latencia (ms)</th></tr></thead>
+                    <tbody>
+                        <tr><td>S–A</td><td>4</td></tr>
+                        <tr><td>S–B</td><td>7</td></tr>
+                        <tr><td>A–B</td><td>2</td></tr>
+                        <tr><td>A–C</td><td>5</td></tr>
+                        <tr><td>B–D</td><td>4</td></tr>
+                        <tr><td>C–E</td><td>3</td></tr>
+                        <tr><td>D–E</td><td>2</td></tr>
+                        <tr><td>C–T</td><td>8</td></tr>
+                        <tr><td>E–T</td><td>4</td></tr>
+                        <tr><td>D–T</td><td>9</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══ Parte a) ═══ -->
+        <section class="part-section" id="p2a">
+            <div class="part-header">
+                <span class="part-badge">a</span>
+                <h3>Aplicar Dijkstra mediante una tabla de etiquetas</h3>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">Paso 1</span> Inicializar las etiquetas</h4>
+                <p>La distancia de S a sí mismo es 0 y las distancias a los demás nodos son inicialmente infinitas.</p>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Nodo</th><th>Distancia inicial</th><th>Predecesor</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>S</td><td class="permanent">0</td><td>—</td></tr>
+                        <tr><td>A</td><td class="provisional">∞</td><td>—</td></tr>
+                        <tr><td>B</td><td class="provisional">∞</td><td>—</td></tr>
+                        <tr><td>C</td><td class="provisional">∞</td><td>—</td></tr>
+                        <tr><td>D</td><td class="provisional">∞</td><td>—</td></tr>
+                        <tr><td>E</td><td class="provisional">∞</td><td>—</td></tr>
+                        <tr><td>T</td><td class="provisional">∞</td><td>—</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">Paso 2</span> Actualizar las distancias en cada iteración</h4>
+                <p>Se selecciona el nodo no visitado con la menor etiqueta y se actualizan las distancias de sus vecinos.</p>
+
+                <!-- Iteration 1 -->
+                <div class="iteration-block">
+                    <h4>Iteración 1: Nodo seleccionado = <strong>S</strong> (distancia = 0)</h4>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(A) = \min(\infty,\; 0 + 4) = 4"></div>
+                        <ul class="explanation">
+                            <li>La distancia provisional anterior era infinita.</li>
+                            <li><strong>Decisión:</strong> Se actualiza la distancia a <strong>4</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(B) = \min(\infty,\; 0 + 7) = 7"></div>
+                        <ul class="explanation">
+                            <li>La distancia provisional anterior era infinita.</li>
+                            <li><strong>Decisión:</strong> Se actualiza la distancia a <strong>7</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Iteration 2 -->
+                <div class="iteration-block">
+                    <h4>Iteración 2: Nodo seleccionado = <strong>A</strong> (distancia = 4)</h4>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(B) = \min(7,\; 4 + 2) = 6"></div>
+                        <ul class="explanation">
+                            <li>7 era la distancia provisional. 4 + 2 = 6 es menor.</li>
+                            <li><strong>Decisión:</strong> Se actualiza la distancia a <strong>6</strong> (Se encontró un camino más corto).</li>
+                        </ul>
+                    </div>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(C) = \min(\infty,\; 4 + 5) = 9"></div>
+                        <ul class="explanation">
+                            <li>La distancia provisional anterior era infinita.</li>
+                            <li><strong>Decisión:</strong> Se actualiza la distancia a <strong>9</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Iteration 3 -->
+                <div class="iteration-block">
+                    <h4>Iteración 3: Nodo seleccionado = <strong>B</strong> (distancia = 6)</h4>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(D) = \min(\infty,\; 6 + 4) = 10"></div>
+                        <ul class="explanation">
+                            <li>La distancia provisional anterior era infinita.</li>
+                            <li><strong>Decisión:</strong> Se actualiza la distancia a <strong>10</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Iteration 4 -->
+                <div class="iteration-block">
+                    <h4>Iteración 4: Nodo seleccionado = <strong>C</strong> (distancia = 9)</h4>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(E) = \min(\infty,\; 9 + 3) = 12"></div>
+                        <ul class="explanation">
+                            <li>La distancia provisional anterior era infinita.</li>
+                            <li><strong>Decisión:</strong> Se actualiza la distancia a <strong>12</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(T) = \min(\infty,\; 9 + 8) = 17"></div>
+                        <ul class="explanation">
+                            <li>La distancia provisional anterior era infinita.</li>
+                            <li><strong>Decisión:</strong> Se actualiza la distancia a <strong>17</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Iteration 5 -->
+                <div class="iteration-block">
+                    <h4>Iteración 5: Nodo seleccionado = <strong>D</strong> (distancia = 10)</h4>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(E) = \min(12,\; 10 + 2) = 12"></div>
+                        <ul class="explanation">
+                            <li>El camino por D tiene el mismo costo (12) que el encontrado por C.</li>
+                            <li><strong>Decisión:</strong> Empate. Se registra como ruta alternativa óptima.</li>
+                        </ul>
+                    </div>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(T) = \min(17,\; 10 + 9) = 17"></div>
+                        <ul class="explanation">
+                            <li>El camino por D tiene costo 19, que es mayor que 17.</li>
+                            <li><strong>Decisión:</strong> Se conserva la distancia anterior de 17.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Iteration 6 -->
+                <div class="iteration-block">
+                    <h4>Iteración 6: Nodo seleccionado = <strong>E</strong> (distancia = 12)</h4>
+                    <div class="equation-row">
+                        <div class="math-eq" data-latex="e(T) = \min(17,\; 12 + 4) = 16"></div>
+                        <ul class="explanation">
+                            <li>17 era la distancia provisional. 12 + 4 = 16 es menor.</li>
+                            <li><strong>Decisión:</strong> Se actualiza la distancia a <strong>16</strong> (Se encontró un camino más corto).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Iteration 7 -->
+                <div class="iteration-block">
+                    <h4>Iteración 7: Nodo seleccionado = <strong>T</strong> (distancia = 16)</h4>
+                    <p class="explanation">Se alcanzó el nodo destino. El algoritmo finaliza.</p>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">Paso 2.5</span> Tabla resumen de iteraciones</h4>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Iter.</th><th>Nodo</th><th>e(S)</th><th>e(A)</th><th>e(B)</th><th>e(C)</th><th>e(D)</th><th>e(E)</th><th>e(T)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td><td>S</td>
+                            <td class="permanent">0</td>
+                            <td class="provisional">4</td>
+                            <td class="provisional">7</td>
+                            <td class="provisional">∞</td>
+                            <td class="provisional">∞</td>
+                            <td class="provisional">∞</td>
+                            <td class="provisional">∞</td>
+                        </tr>
+                        <tr>
+                            <td>2</td><td>A</td>
+                            <td class="permanent">0</td>
+                            <td class="permanent">4</td>
+                            <td class="provisional">6</td>
+                            <td class="provisional">9</td>
+                            <td class="provisional">∞</td>
+                            <td class="provisional">∞</td>
+                            <td class="provisional">∞</td>
+                        </tr>
+                        <tr>
+                            <td>3</td><td>B</td>
+                            <td class="permanent">0</td>
+                            <td class="permanent">4</td>
+                            <td class="permanent">6</td>
+                            <td class="provisional">9</td>
+                            <td class="provisional">10</td>
+                            <td class="provisional">∞</td>
+                            <td class="provisional">∞</td>
+                        </tr>
+                        <tr>
+                            <td>4</td><td>C</td>
+                            <td class="permanent">0</td>
+                            <td class="permanent">4</td>
+                            <td class="permanent">6</td>
+                            <td class="permanent">9</td>
+                            <td class="provisional">10</td>
+                            <td class="provisional">12</td>
+                            <td class="provisional">17</td>
+                        </tr>
+                        <tr>
+                            <td>5</td><td>D</td>
+                            <td class="permanent">0</td>
+                            <td class="permanent">4</td>
+                            <td class="permanent">6</td>
+                            <td class="permanent">9</td>
+                            <td class="permanent">10</td>
+                            <td class="provisional">12</td>
+                            <td class="provisional">17</td>
+                        </tr>
+                        <tr>
+                            <td>6</td><td>E</td>
+                            <td class="permanent">0</td>
+                            <td class="permanent">4</td>
+                            <td class="permanent">6</td>
+                            <td class="permanent">9</td>
+                            <td class="permanent">10</td>
+                            <td class="permanent">12</td>
+                            <td class="provisional">16</td>
+                        </tr>
+                        <tr>
+                            <td>7</td><td>T</td>
+                            <td class="permanent">0</td>
+                            <td class="permanent">4</td>
+                            <td class="permanent">6</td>
+                            <td class="permanent">9</td>
+                            <td class="permanent">10</td>
+                            <td class="permanent">12</td>
+                            <td class="permanent">16</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">Paso 3</span> Reconstruir las rutas óptimas</h4>
+
+                <div class="route-comparison dual-routes">
+                    <div class="route-card primary-route">
+                        <div class="route-label">Primera ruta óptima</div>
+                        <div class="route-path">S → A → C → E → T</div>
+                        <div class="math-display" data-latex="L_1 = 4 + 5 + 3 + 4 = \boxed{16 \text{ ms}}"></div>
+                    </div>
+                    <div class="route-card alt-route">
+                        <div class="route-label">Segunda ruta óptima</div>
+                        <div class="route-path">S → A → B → D → E → T</div>
+                        <div class="math-display" data-latex="L_2 = 4 + 2 + 4 + 2 + 4 = \boxed{16 \text{ ms}}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-box success">
+                <div class="answer-label">Respuesta a)</div>
+                <p>La latencia mínima es de <strong>16 ms</strong> y existen <strong>dos rutas óptimas</strong>. Por lo tanto, la ruta óptima <strong>no es única</strong>.</p>
+            </div>
+        </section>
+
+        <!-- ═══ Parte b) ═══ -->
+        <section class="part-section" id="p2b">
+            <div class="part-header">
+                <span class="part-badge">b</span>
+                <h3>Si falla el enlace E–T, determinar la nueva ruta y el aumento porcentual</h3>
+            </div>
+
+            <p>Al fallar E–T, se elimina ese enlace del grafo y se recalculan las rutas hacia T.</p>
+
+            <div class="graph-container mini-graph">
+                <svg id="graph-p2b" width="100%" height="400" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+
+            <div class="step-block">
+                <p>La ruta más corta pasa a ser:</p>
+                <div class="route-card primary-route" style="max-width: 400px; margin: 1rem auto;">
+                    <div class="route-label">Nueva ruta óptima</div>
+                    <div class="route-path">S → A → C → T</div>
+                    <div class="math-display" data-latex="L' = 4 + 5 + 8 = \boxed{17 \text{ ms}}"></div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <h4>Cálculo del aumento porcentual</h4>
+                <div class="math-display" data-latex="\Delta L = 17 - 16 = 1 \text{ ms}"></div>
+                <div class="math-display" data-latex="\%\text{ aumento} = \frac{17 - 16}{16} \times 100"></div>
+                <div class="result-box">
+                    <div class="math-display" data-latex="\boxed{\%\text{ aumento} = 6{,}25\%}"></div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Respuesta b)</div>
+                <p>La nueva ruta óptima es <strong>S → A → C → T</strong>, con una latencia de <strong>17 ms</strong>. La latencia aumenta 1 ms, equivalente al <strong>6,25%</strong>.</p>
+            </div>
+        </section>
+
+        <!-- ═══ Parte c) ═══ -->
+        <section class="part-section" id="p2c">
+            <div class="part-header">
+                <span class="part-badge">c</span>
+                <h3>Ventaja operativa de tener varias rutas con la misma latencia mínima</h3>
+            </div>
+
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <div class="adv-icon">🛡️</div>
+                    <h4>Tolerancia a fallos</h4>
+                    <p>Si falla un enlace de una ruta, el tráfico puede redirigirse por otra alternativa.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="adv-icon">⚡</div>
+                    <h4>Alta disponibilidad</h4>
+                    <p>Se reduce la posibilidad de interrumpir el servicio al tener caminos redundantes.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="adv-icon">⚖️</div>
+                    <h4>Balanceo de carga</h4>
+                    <p>El tráfico puede distribuirse entre rutas equivalentes, si el protocolo lo permite.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="adv-icon">🔄</div>
+                    <h4>Continuidad del servicio</h4>
+                    <p>Se pueden mantener latencias bajas incluso cuando se presenta una falla.</p>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Conclusión</div>
+                <p>Tener rutas alternativas con igual latencia mínima mejora la <strong>confiabilidad</strong> y la <strong>disponibilidad</strong> de la red sin sacrificar el tiempo de transmisión. Sin embargo, la redundancia solo es efectiva si las rutas alternativas no dependen del mismo enlace o equipo crítico.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  RESUMEN FINAL                                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="summary-section" id="summary-section">
+        <h2>📋 Resumen de Resultados</h2>
+        <table class="dijkstra-table summary-table">
+            <thead>
+                <tr><th>Ejercicio</th><th>Resultado</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>1.a</strong></td><td>Árbol mínimo: 109 km; costo de $1.962.000.000 COP</td></tr>
+                <tr><td><strong>1.b</strong></td><td>Nuevo árbol: 119 km; sobrecosto de $180.000.000 COP (9,17%)</td></tr>
+                <tr><td><strong>1.c</strong></td><td>Enlace de redundancia C–F: 27 km; costo adicional de $486.000.000 COP</td></tr>
+                <tr><td><strong>2.a</strong></td><td>Dos rutas óptimas; latencia mínima de 16 ms</td></tr>
+                <tr><td><strong>2.b</strong></td><td>Nueva latencia: 17 ms; aumento del 6,25%</td></tr>
+                <tr><td><strong>2.c</strong></td><td>Mayor tolerancia a fallos, disponibilidad y posibilidad de balanceo de carga</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <script type="module" src="src/ejercicios.js"></script>
+</body>
+</html>
