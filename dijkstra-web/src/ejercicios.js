@@ -342,6 +342,428 @@ function renderProblem2bGraph() {
     });
 }
 
+// ── Problem 3 Graph Data (Ford-Fulkerson – Max Flow) ──────────
+const P3_NODES = {
+    S: { x: 120, y: 240, label: 'S', sub: 'Fuente' },
+    A: { x: 400, y: 110, label: 'A', sub: '' },
+    B: { x: 400, y: 370, label: 'B', sub: '' },
+    T: { x: 680, y: 240, label: 'T', sub: 'Sumidero' }
+};
+
+const P3_EDGES = [
+    { u: 'S', v: 'A', c: 5 },
+    { u: 'S', v: 'B', c: 3 },
+    { u: 'A', v: 'B', c: 2 },
+    { u: 'A', v: 'T', c: 4 },
+    { u: 'B', v: 'T', c: 5 }
+];
+
+const P3_STEPS = [
+    {
+        step: 0,
+        title: 'Paso 1: Inicialización',
+        path: null,
+        delta: '—',
+        totalFlow: 0,
+        status: 'Inicialización (Flujo = 0)',
+        flows: { 'S-A': 0, 'S-B': 0, 'A-B': 0, 'A-T': 0, 'B-T': 0 },
+        showCut: false
+    },
+    {
+        step: 1,
+        title: 'Iteración 1: S → A → T',
+        path: ['S', 'A', 'T'],
+        delta: 4,
+        totalFlow: 4,
+        status: 'Camino S → A → T (+4)',
+        flows: { 'S-A': 4, 'S-B': 0, 'A-B': 0, 'A-T': 4, 'B-T': 0 },
+        showCut: false
+    },
+    {
+        step: 2,
+        title: 'Iteración 2: S → B → T',
+        path: ['S', 'B', 'T'],
+        delta: 3,
+        totalFlow: 7,
+        status: 'Camino S → B → T (+3)',
+        flows: { 'S-A': 4, 'S-B': 3, 'A-B': 0, 'A-T': 4, 'B-T': 3 },
+        showCut: false
+    },
+    {
+        step: 3,
+        title: 'Iteración 3: S → A → B → T',
+        path: ['S', 'A', 'B', 'T'],
+        delta: 1,
+        totalFlow: 8,
+        status: 'Camino residual S → A → B → T (+1)',
+        flows: { 'S-A': 5, 'S-B': 3, 'A-B': 1, 'A-T': 4, 'B-T': 4 },
+        showCut: false
+    },
+    {
+        step: 4,
+        title: 'Paso 5: Condición de Parada & Corte Mínimo',
+        path: null,
+        delta: '0 (Sin caminos)',
+        totalFlow: 8,
+        status: '¡Flujo Máximo = 8! Corte Mínimo = 8',
+        flows: { 'S-A': 5, 'S-B': 3, 'A-B': 1, 'A-T': 4, 'B-T': 4 },
+        showCut: true
+    }
+];
+
+let p3CurrentStep = 0;
+let p3AutoplayTimer = null;
+
+function updateP3Controls(stepIdx) {
+    const stepData = P3_STEPS[stepIdx];
+    const ind = document.getElementById('p3-step-indicator');
+    if (ind) {
+        ind.textContent = `Paso ${stepIdx} / 4: ${stepData.title}`;
+    }
+
+    const statFlow = document.getElementById('p3-stat-flow');
+    if (statFlow) {
+        statFlow.textContent = `${stepData.totalFlow} / 8`;
+        statFlow.style.color = stepData.totalFlow === 8 ? 'var(--ink-green)' : 'var(--ink-dark)';
+    }
+
+    const statPath = document.getElementById('p3-stat-path');
+    if (statPath) {
+        statPath.textContent = stepData.path ? stepData.path.join(' → ') : '—';
+    }
+
+    const statDelta = document.getElementById('p3-stat-delta');
+    if (statDelta) {
+        statDelta.textContent = stepData.delta !== null ? String(stepData.delta) : '—';
+    }
+
+    const statStatus = document.getElementById('p3-stat-status');
+    if (statStatus) {
+        statStatus.textContent = stepData.status;
+    }
+
+    const btnPrev = document.getElementById('p3-btn-prev');
+    if (btnPrev) btnPrev.disabled = stepIdx === 0;
+
+    const btnNext = document.getElementById('p3-btn-next');
+    if (btnNext) btnNext.disabled = stepIdx === P3_STEPS.length - 1;
+}
+
+function setP3Step(newStep) {
+    p3CurrentStep = Math.max(0, Math.min(P3_STEPS.length - 1, newStep));
+    drawFlowGraph(p3CurrentStep);
+}
+
+function stopP3Autoplay() {
+    if (p3AutoplayTimer) {
+        clearInterval(p3AutoplayTimer);
+        p3AutoplayTimer = null;
+        const btn = document.getElementById('p3-btn-autoplay');
+        if (btn) btn.textContent = '▶ Auto';
+    }
+}
+
+function drawFlowGraph(stepIdx) {
+    const svg = document.getElementById('graph-p3');
+    if (!svg) return;
+    svg.innerHTML = '';
+
+    const stepData = P3_STEPS[stepIdx];
+    const pathSet = new Set();
+    if (stepData.path) {
+        for (let i = 0; i < stepData.path.length - 1; i++) {
+            pathSet.add(`${stepData.path[i]}-${stepData.path[i+1]}`);
+        }
+    }
+
+    // Definitions: markers
+    const defs = createSVGElement('defs');
+
+    const markerColors = [
+        { id: 'p3-arrow-norm', color: 'rgba(31, 46, 90, 0.5)' },
+        { id: 'p3-arrow-sat', color: '#b3261e' },
+        { id: 'p3-arrow-act', color: '#1b6e44' },
+        { id: 'p3-arrow-part', color: '#c98a1b' }
+    ];
+
+    for (const mc of markerColors) {
+        const marker = createSVGElement('marker', {
+            id: mc.id,
+            viewBox: '0 0 10 10',
+            refX: '7',
+            refY: '5',
+            markerWidth: '6',
+            markerHeight: '6',
+            orient: 'auto-start-reverse'
+        });
+        const path = createSVGElement('path', {
+            d: 'M 0 1.5 L 9 5 L 0 8.5 z',
+            fill: mc.color
+        });
+        marker.appendChild(path);
+        defs.appendChild(marker);
+    }
+    svg.appendChild(defs);
+
+    const bgGroup = createSVGElement('g');
+    const edgesGroup = createSVGElement('g');
+    const nodesGroup = createSVGElement('g');
+
+    // If showCut is true, draw partition regions and dashed cut line
+    if (stepData.showCut) {
+        // Cut region S
+        const regS = createSVGElement('rect', {
+            x: 40, y: 35, width: 190, height: 410, rx: 12,
+            fill: 'rgba(27, 110, 68, 0.07)',
+            stroke: 'rgba(27, 110, 68, 0.3)',
+            'stroke-width': '1.5',
+            'stroke-dasharray': '5,4'
+        });
+        bgGroup.appendChild(regS);
+
+        const lblS = createSVGElement('text', {
+            x: 135, y: 65,
+            fill: 'var(--ink-green)',
+            'font-family': 'var(--font-mono)',
+            'font-size': '13px',
+            'font-weight': 'bold',
+            'text-anchor': 'middle'
+        });
+        lblS.textContent = 'Conjunto S = {S}';
+        bgGroup.appendChild(lblS);
+
+        // Cut region T
+        const regT = createSVGElement('rect', {
+            x: 290, y: 35, width: 470, height: 410, rx: 12,
+            fill: 'rgba(31, 46, 90, 0.04)',
+            stroke: 'rgba(31, 46, 90, 0.2)',
+            'stroke-width': '1.5',
+            'stroke-dasharray': '5,4'
+        });
+        bgGroup.appendChild(regT);
+
+        const lblT = createSVGElement('text', {
+            x: 525, y: 65,
+            fill: 'var(--ink-dark)',
+            'font-family': 'var(--font-mono)',
+            'font-size': '13px',
+            'font-weight': 'bold',
+            'text-anchor': 'middle'
+        });
+        lblT.textContent = 'Conjunto T = {A, B, T}';
+        bgGroup.appendChild(lblT);
+
+        // Cut curve line
+        const cutPath = createSVGElement('path', {
+            d: 'M 260 30 Q 285 240 260 450',
+            stroke: 'var(--ink-red)',
+            'stroke-width': '3',
+            'stroke-dasharray': '8,6',
+            fill: 'none'
+        });
+        bgGroup.appendChild(cutPath);
+
+        // Cut badge
+        const cutBadgeBg = createSVGElement('rect', {
+            x: 175, y: 226, width: 180, height: 28, rx: 4,
+            fill: 'var(--ink-red)',
+            stroke: 'white',
+            'stroke-width': '1.5'
+        });
+        bgGroup.appendChild(cutBadgeBg);
+
+        const cutBadgeText = createSVGElement('text', {
+            x: 265, y: 245,
+            fill: 'white',
+            'font-family': 'var(--font-mono)',
+            'font-size': '12px',
+            'font-weight': 'bold',
+            'text-anchor': 'middle'
+        });
+        cutBadgeText.textContent = '✂ Corte Mínimo = 8';
+        bgGroup.appendChild(cutBadgeText);
+    }
+
+    svg.appendChild(bgGroup);
+
+    // Node radius
+    const R = 28;
+
+    // Draw edges
+    for (const edge of P3_EDGES) {
+        const p1 = P3_NODES[edge.u];
+        const p2 = P3_NODES[edge.v];
+        const key = `${edge.u}-${edge.v}`;
+        const flow = stepData.flows[key] || 0;
+        const cap = edge.c;
+        const res = cap - flow;
+        const isSaturated = flow === cap;
+        const isActivePath = pathSet.has(key);
+
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const ux = dx / dist;
+        const uy = dy / dist;
+
+        // Truncate line endpoints to node boundaries
+        const sx = p1.x + ux * R;
+        const sy = p1.y + uy * R;
+        const ex = p2.x - ux * (R + 8);
+        const ey = p2.y - uy * (R + 8);
+
+        let strokeColor = 'rgba(31, 46, 90, 0.35)';
+        let strokeWidth = '3';
+        let markerId = 'p3-arrow-norm';
+        let isAnimated = false;
+
+        if (isActivePath) {
+            strokeColor = 'var(--ink-green)';
+            strokeWidth = '6';
+            markerId = 'p3-arrow-act';
+            isAnimated = true;
+        } else if (isSaturated) {
+            strokeColor = 'var(--ink-red)';
+            strokeWidth = '4';
+            markerId = 'p3-arrow-sat';
+        } else if (flow > 0) {
+            strokeColor = 'var(--ink-ochre)';
+            strokeWidth = '3.5';
+            markerId = 'p3-arrow-part';
+        }
+
+        const line = createSVGElement('line', {
+            x1: sx, y1: sy, x2: ex, y2: ey,
+            stroke: strokeColor,
+            'stroke-width': strokeWidth,
+            'stroke-linecap': 'round',
+            'marker-end': `url(#${markerId})`
+        });
+
+        if (isAnimated) {
+            const anim = createSVGElement('animate', {
+                attributeName: 'stroke-opacity',
+                values: '0.5;1;0.5',
+                dur: '1.5s',
+                repeatCount: 'indefinite'
+            });
+            line.appendChild(anim);
+        }
+        edgesGroup.appendChild(line);
+
+        // Label position
+        const mx = (p1.x + p2.x) / 2;
+        const my = (p1.y + p2.y) / 2;
+
+        let nx = -uy;
+        let ny = ux;
+        let offsetDist = 18;
+
+        if (key === 'A-B') {
+            nx = -1; ny = 0;
+            offsetDist = 32;
+        } else if (key === 'S-B' || key === 'B-T') {
+            offsetDist = -20;
+        }
+
+        const lx = mx + nx * offsetDist;
+        const ly = my + ny * offsetDist;
+
+        const pillWidth = isSaturated ? 98 : 84;
+        const pillHeight = 22;
+        const pillBg = createSVGElement('rect', {
+            x: lx - pillWidth / 2,
+            y: ly - pillHeight / 2,
+            width: pillWidth,
+            height: pillHeight,
+            rx: 4,
+            fill: isActivePath ? '#e8f5e9' : isSaturated ? '#fdecea' : 'var(--bg-paper)',
+            stroke: isActivePath ? 'var(--ink-green)' : isSaturated ? 'var(--ink-red)' : 'rgba(31, 46, 90, 0.25)',
+            'stroke-width': isActivePath || isSaturated ? '1.5' : '1'
+        });
+        edgesGroup.appendChild(pillBg);
+
+        const pillText = createSVGElement('text', {
+            x: lx,
+            y: ly + 4,
+            'font-family': 'var(--font-mono)',
+            'font-size': '11.5px',
+            'font-weight': 'bold',
+            'text-anchor': 'middle',
+            fill: isSaturated ? 'var(--ink-red)' : isActivePath ? 'var(--ink-green)' : 'var(--ink-dark)'
+        });
+
+        if (isSaturated) {
+            pillText.textContent = `${flow}/${cap} (Sat)`;
+        } else {
+            pillText.textContent = `${flow}/${cap} [r:${res}]`;
+        }
+        edgesGroup.appendChild(pillText);
+    }
+
+    svg.appendChild(edgesGroup);
+
+    // Draw nodes
+    for (const [name, node] of Object.entries(P3_NODES)) {
+        const g = createSVGElement('g', {
+            transform: `translate(${node.x}, ${node.y})`
+        });
+
+        let circStroke = 'var(--ink-dark)';
+        let circWidth = '2.5';
+        let circFill = 'white';
+
+        if (name === 'S') {
+            circStroke = 'var(--ink-ochre)';
+            circFill = '#fff9ed';
+            circWidth = '3.5';
+        } else if (name === 'T') {
+            circStroke = 'var(--ink-green)';
+            circFill = '#edf7f1';
+            circWidth = '3.5';
+        }
+
+        const circle = createSVGElement('circle', {
+            cx: 0, cy: 0, r: R,
+            fill: circFill,
+            stroke: circStroke,
+            'stroke-width': circWidth
+        });
+        g.appendChild(circle);
+
+        const text = createSVGElement('text', {
+            x: 0, y: node.sub ? 1 : 6,
+            fill: 'var(--ink-dark)',
+            'font-family': 'var(--font-serif)',
+            'font-size': '19px',
+            'font-weight': 'bold',
+            'text-anchor': 'middle'
+        });
+        text.textContent = node.label;
+        g.appendChild(text);
+
+        if (node.sub) {
+            const sub = createSVGElement('text', {
+                x: 0, y: 16,
+                fill: '#666',
+                'font-family': 'var(--font-mono)',
+                'font-size': '9.5px',
+                'text-anchor': 'middle',
+                'font-weight': '600'
+            });
+            sub.textContent = node.sub;
+            g.appendChild(sub);
+        }
+
+        nodesGroup.appendChild(g);
+    }
+
+    svg.appendChild(nodesGroup);
+
+    // Update status controls
+    updateP3Controls(stepIdx);
+}
+
 // ── Tab Switching ─────────────────────────────────────────────
 function switchProblem(num) {
     document.querySelectorAll('.problem-tab').forEach(tab => {
@@ -353,23 +775,68 @@ function switchProblem(num) {
     const panel = document.getElementById(`panel-prob${num}`);
     if (panel) {
         panel.style.display = 'block';
-        // Re-trigger animations
         panel.style.animation = 'none';
         panel.offsetHeight; // force reflow
         panel.style.animation = '';
     }
 
+    try {
+        const url = new URL(window.location);
+        url.searchParams.set('prob', num);
+        window.history.replaceState(null, '', url);
+    } catch (e) {}
+
     if (num === 1) {
         renderProblem1Graph();
         renderProblem1bGraph();
-    } else {
+    } else if (num === 2) {
         renderProblem2Graph();
         renderProblem2bGraph();
+    } else if (num === 3) {
+        drawFlowGraph(p3CurrentStep);
     }
 }
 
 document.getElementById('tab-prob1')?.addEventListener('click', () => switchProblem(1));
 document.getElementById('tab-prob2')?.addEventListener('click', () => switchProblem(2));
+document.getElementById('tab-prob3')?.addEventListener('click', () => switchProblem(3));
+
+// Controls for Problem 3
+document.getElementById('p3-btn-prev')?.addEventListener('click', () => {
+    stopP3Autoplay();
+    setP3Step(p3CurrentStep - 1);
+});
+
+document.getElementById('p3-btn-next')?.addEventListener('click', () => {
+    stopP3Autoplay();
+    setP3Step(p3CurrentStep + 1);
+});
+
+document.getElementById('p3-btn-reset')?.addEventListener('click', () => {
+    stopP3Autoplay();
+    setP3Step(0);
+});
+
+document.getElementById('p3-btn-autoplay')?.addEventListener('click', () => {
+    const btn = document.getElementById('p3-btn-autoplay');
+    if (p3AutoplayTimer) {
+        stopP3Autoplay();
+    } else {
+        if (p3CurrentStep >= P3_STEPS.length - 1) {
+            p3CurrentStep = 0;
+            drawFlowGraph(p3CurrentStep);
+        }
+        if (btn) btn.textContent = '⏸ Pausa';
+        p3AutoplayTimer = setInterval(() => {
+            if (p3CurrentStep < P3_STEPS.length - 1) {
+                p3CurrentStep++;
+                drawFlowGraph(p3CurrentStep);
+            } else {
+                stopP3Autoplay();
+            }
+        }, 2200);
+    }
+});
 
 // ── KaTeX Rendering ───────────────────────────────────────────
 function renderAllMath() {
@@ -428,15 +895,24 @@ function renderAllMath() {
 // ── Initialization ────────────────────────────────────────────
 function init() {
     renderAllMath();
-    // Render initial graphs (Problem 1 is visible by default)
-    renderProblem1Graph();
-    renderProblem1bGraph();
+
+    let initialProb = 1;
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const p = params.get('prob');
+        const hashMatch = window.location.hash.match(/prob(\d)/i);
+        const selected = p || (hashMatch ? hashMatch[1] : null);
+        if (selected && ['1', '2', '3'].includes(selected)) {
+            initialProb = Number(selected);
+        }
+    } catch (e) {}
+
+    switchProblem(initialProb);
 }
 
 // Try rendering math immediately and again on load (for deferred KaTeX)
 init();
 window.addEventListener('load', () => {
     renderAllMath();
-    renderProblem1Graph();
-    renderProblem1bGraph();
+    init();
 });

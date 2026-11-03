@@ -6,6 +6,16 @@ Repositorio con implementaciones y cuaderno interactivo para algoritmos fundamen
 
 - **Algoritmo de Dijkstra**: Cálculo de la ruta más corta en grafos dirigidos y no dirigidos con pesos no negativos.
 - **Algoritmo de Kruskal**: Determinación del Árbol de Expansión Mínima (MST) utilizando conjuntos disjuntos (Disjoint-Set / Union-Find) con compresión de caminos y unión por rango.
+- **Algoritmo de Ford-Fulkerson**: Cálculo del Flujo Máximo en redes de distribución y canales con demostración mediante el Teorema del Corte Mínimo.
+
+---
+
+## 📝 Ejercicios del Quiz
+Acceso directo a la resolución y visualización interactiva paso a paso de los ejercicios:
+- [Soluciones Interactivas del Quiz](https://hayderfino.github.io/investigacion-operaciones-/dijkstra-web/ejercicios.html)
+  - **Problema 1**: Red de Fibra Óptica (Kruskal)
+  - **Problema 2**: Enrutamiento de Latencia (Dijkstra)
+  - **Problema 3**: Flujo Máximo y Red Residual (Ford-Fulkerson)
 
 ---
 

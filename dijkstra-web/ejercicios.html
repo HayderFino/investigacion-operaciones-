@@ -37,6 +37,11 @@
             <span class="prob-label">Problema 2</span>
             <span class="prob-name">Enrutamiento de Latencia (Dijkstra)</span>
         </button>
+        <button type="button" class="problem-tab" id="tab-prob3" data-prob="3">
+            <span class="prob-icon">🌊</span>
+            <span class="prob-label">Problema 3</span>
+            <span class="prob-name">Flujo Máximo (Ford-Fulkerson)</span>
+        </button>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -595,6 +600,252 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  PROBLEMA 3: RED DE CANALES Y FLUJO MÁXIMO (FORD-FULKERSON)    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="problem-panel" id="panel-prob3" style="display:none;">
+        <header class="problem-header">
+            <div class="problem-number">Problema 3</div>
+            <h2>Red de Canales y Flujo Máximo</h2>
+            <p class="problem-statement">
+                Se tiene una red de canales de distribución con cuatro nodos: la fuente <strong>S</strong>, los nodos intermedios <strong>A y B</strong>, y el sumidero <strong>T</strong>.
+                Se busca maximizar el flujo total que viaja desde <strong>S</strong> hasta <strong>T</strong> aplicando el <strong>Algoritmo de Ford-Fulkerson</strong> con redes residuales y verificando la optimalidad mediante el <strong>Teorema del Corte Mínimo</strong>.
+            </p>
+            <div class="meta-strip">
+                <span class="meta-pill"><strong>Algoritmo:</strong> Ford-Fulkerson (Edmonds-Karp)</span>
+                <span class="meta-pill"><strong>Nodos:</strong> 4 (S, A, B, T)</span>
+                <span class="meta-pill"><strong>Canales:</strong> 5 arcos dirigidos</span>
+                <span class="meta-pill"><strong>Objetivo:</strong> Flujo Máximo & Corte Mínimo</span>
+            </div>
+        </header>
+
+        <!-- SVG Graph for Problem 3 with Step Controls -->
+        <section class="graph-section">
+            <h3 class="section-title"><span class="section-icon">📊</span> Grafo Dinámico de la Red Residual y Flujo</h3>
+            
+            <div class="graph-controls-bar">
+                <button type="button" class="graph-ctrl-btn" id="p3-btn-prev">◀ Paso Anterior</button>
+                <div class="step-indicator-badge" id="p3-step-indicator">Paso 0 / 4: Inicialización</div>
+                <button type="button" class="graph-ctrl-btn" id="p3-btn-next">Siguiente Paso ▶</button>
+                <button type="button" class="graph-ctrl-btn" id="p3-btn-autoplay">▶ Auto</button>
+                <button type="button" class="graph-ctrl-btn" id="p3-btn-reset">↺ Reiniciar</button>
+            </div>
+
+            <div class="graph-container">
+                <svg id="graph-p3" width="100%" height="480" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+
+            <div class="flow-status-grid">
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Flujo Total Actual</div>
+                    <div class="flow-status-val" id="p3-stat-flow" style="color:var(--ink-green)">0 / 8</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Camino Activo</div>
+                    <div class="flow-status-val" id="p3-stat-path" style="font-family:var(--font-mono); font-size:1.05rem;">—</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Cuello de Botella (δ)</div>
+                    <div class="flow-status-val" id="p3-stat-delta">—</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Estado</div>
+                    <div class="flow-status-val" id="p3-stat-status" style="font-size:1.05rem;">Inicialización</div>
+                </div>
+            </div>
+
+            <div class="graph-legend" style="margin-top:1.25rem;">
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-green); height:6px;"></span> Camino de Aumento</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-red); height:4px;"></span> Canal Saturado (f = c)</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-ochre); height:4px;"></span> Canal con Flujo Parcial</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:rgba(31,46,90,0.3); height:2px;"></span> Sin Flujo (f = 0)</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-red); border-top:2px dashed var(--ink-red); height:0;"></span> Corte Mínimo</span>
+            </div>
+        </section>
+
+        <!-- ═══ Parte a) Procedimiento Paso a Paso ═══ -->
+        <section class="part-section" id="p3a">
+            <div class="part-header">
+                <span class="part-badge">a</span>
+                <h3>Ejecución detallada del Algoritmo de Ford-Fulkerson</h3>
+            </div>
+
+            <!-- Paso 1 -->
+            <div class="step-block">
+                <h4><span class="step-num">Paso 1</span> Inicialización (Flujo cero en todos los arcos)</h4>
+                <p>
+                    Se establece el flujo inicial en todos los arcos como <span class="katex-inline" data-latex="f(u,v) = 0"></span>.
+                    La Red Residual inicial <span class="katex-inline" data-latex="G_f"></span> tiene exactamente las mismas capacidades que la red original porque aún no se ha usado ningún canal.
+                </p>
+                <div class="math-display" data-latex="\text{Flujo Total Inicial} = 0"></div>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Canal</th><th>Capacidad Original (c)</th><th>Flujo Inicial (f)</th><th>Capacidad Residual (c_f)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>S → A</td><td>5</td><td>0</td><td>5</td></tr>
+                        <tr><td>S → B</td><td>3</td><td>0</td><td>3</td></tr>
+                        <tr><td>A → B</td><td>2</td><td>0</td><td>2</td></tr>
+                        <tr><td>A → T</td><td>4</td><td>0</td><td>4</td></tr>
+                        <tr><td>B → T</td><td>5</td><td>0</td><td>5</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="step-block">
+                <h4><span class="step-num">Paso 2</span> Iteración 1 — Primer camino de aumento</h4>
+                <p>Buscamos un camino desde la fuente <span class="katex-inline" data-latex="S"></span> hasta el sumidero <span class="katex-inline" data-latex="T"></span> en la red residual:</p>
+                <div class="tree-result">
+                    <strong>Camino seleccionado:</strong> <span class="katex-inline" data-latex="P_1: S \to A \to T"></span>
+                </div>
+                <p>Calculamos el cuello de botella (capacidad residual mínima del camino):</p>
+                <div class="math-display" data-latex="\delta_1 = \min\{c_f(S, A),\, c_f(A, T)\} = \min(5,\, 4) = 4"></div>
+                <p>Aumentamos el flujo en <span class="katex-inline" data-latex="\delta_1 = 4"></span> a lo largo del camino y actualizamos la red residual:</p>
+                <ul>
+                    <li><span class="katex-inline" data-latex="f(S, A) = 0 + 4 = 4"></span> (residual hacia adelante: <span class="katex-inline" data-latex="5 - 4 = 1"></span>, residual inverso: <span class="katex-inline" data-latex="4"></span>)</li>
+                    <li><span class="katex-inline" data-latex="f(A, T) = 0 + 4 = 4"></span> (residual hacia adelante: <span class="katex-inline" data-latex="4 - 4 = 0"></span>, <strong>¡canal saturado!</strong>)</li>
+                </ul>
+                <div class="math-display" data-latex="\text{Flujo Total} = 0 + 4 = 4"></div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="step-block">
+                <h4><span class="step-num">Paso 3</span> Iteración 2 — Segundo camino de aumento</h4>
+                <p>Buscamos un nuevo camino desde <span class="katex-inline" data-latex="S"></span> hasta <span class="katex-inline" data-latex="T"></span> con capacidades residuales estrictamente positivas:</p>
+                <div class="tree-result">
+                    <strong>Camino seleccionado:</strong> <span class="katex-inline" data-latex="P_2: S \to B \to T"></span>
+                </div>
+                <p>Calculamos el cuello de botella:</p>
+                <div class="math-display" data-latex="\delta_2 = \min\{c_f(S, B),\, c_f(B, T)\} = \min(3,\, 5) = 3"></div>
+                <p>Aumentamos el flujo en <span class="katex-inline" data-latex="\delta_2 = 3"></span> y actualizamos la red residual:</p>
+                <ul>
+                    <li><span class="katex-inline" data-latex="f(S, B) = 0 + 3 = 3"></span> (residual hacia adelante: <span class="katex-inline" data-latex="3 - 3 = 0"></span>, <strong>¡canal saturado!</strong>)</li>
+                    <li><span class="katex-inline" data-latex="f(B, T) = 0 + 3 = 3"></span> (residual hacia adelante: <span class="katex-inline" data-latex="5 - 3 = 2"></span>)</li>
+                </ul>
+                <div class="math-display" data-latex="\text{Flujo Total} = 4 + 3 = 7"></div>
+            </div>
+
+            <!-- Paso 4 -->
+            <div class="step-block">
+                <h4><span class="step-num">Paso 4</span> Iteración 3 — Tercer camino de aumento (vía intermedia A → B)</h4>
+                <p>Exploramos la red residual restante:</p>
+                <ul>
+                    <li>Desde <span class="katex-inline" data-latex="S"></span> podemos ir a <span class="katex-inline" data-latex="A"></span> porque <span class="katex-inline" data-latex="c_f(S, A) = 1 > 0"></span>.</li>
+                    <li>Desde <span class="katex-inline" data-latex="A"></span> no podemos ir directo a <span class="katex-inline" data-latex="T"></span> (<span class="katex-inline" data-latex="c_f(A, T) = 0"></span>), pero sí podemos cruzar hacia <span class="katex-inline" data-latex="B"></span> ya que <span class="katex-inline" data-latex="c_f(A, B) = 2 > 0"></span>.</li>
+                    <li>Desde <span class="katex-inline" data-latex="B"></span> podemos llegar al sumidero <span class="katex-inline" data-latex="T"></span> porque <span class="katex-inline" data-latex="c_f(B, T) = 2 > 0"></span>.</li>
+                </ul>
+                <div class="tree-result">
+                    <strong>Camino seleccionado:</strong> <span class="katex-inline" data-latex="P_3: S \to A \to B \to T"></span>
+                </div>
+                <p>Calculamos el cuello de botella:</p>
+                <div class="math-display" data-latex="\delta_3 = \min\{c_f(S, A),\, c_f(A, B),\, c_f(B, T)\} = \min(1,\, 2,\, 2) = 1"></div>
+                <p>Aumentamos el flujo en <span class="katex-inline" data-latex="\delta_3 = 1"></span>:</p>
+                <ul>
+                    <li><span class="katex-inline" data-latex="f(S, A) = 4 + 1 = 5"></span> (residual hacia adelante: <span class="katex-inline" data-latex="1 - 1 = 0"></span>, <strong>¡canal saturado!</strong>)</li>
+                    <li><span class="katex-inline" data-latex="f(A, B) = 0 + 1 = 1"></span> (residual hacia adelante: <span class="katex-inline" data-latex="2 - 1 = 1"></span>)</li>
+                    <li><span class="katex-inline" data-latex="f(B, T) = 3 + 1 = 4"></span> (residual hacia adelante: <span class="katex-inline" data-latex="2 - 1 = 1"></span>)</li>
+                </ul>
+                <div class="math-display" data-latex="\text{Flujo Total} = 7 + 1 = 8"></div>
+            </div>
+
+            <!-- Paso 5 -->
+            <div class="step-block">
+                <h4><span class="step-num">Paso 5</span> Terminación del algoritmo</h4>
+                <p>
+                    Revisamos los arcos salientes desde la fuente <span class="katex-inline" data-latex="S"></span> en la red residual:
+                </p>
+                <div class="math-display" data-latex="c_f(S, A) = 0, \quad c_f(S, B) = 0"></div>
+                <p class="note-box">
+                    Ningún canal saliente de <span class="katex-inline" data-latex="S"></span> tiene capacidad residual positiva. Por lo tanto, el conjunto de nodos alcanzables desde <span class="katex-inline" data-latex="S"></span> en <span class="katex-inline" data-latex="G_f"></span> es únicamente <span class="katex-inline" data-latex="\{S\}"></span>. No existe camino de aumento posible y el algoritmo concluye.
+                </p>
+                <div class="result-box">
+                    <div class="math-display" data-latex="\boxed{\text{Flujo Máximo Total} = 8}"></div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Respuesta a)</div>
+                <p>El algoritmo de Ford-Fulkerson encuentra 3 caminos de aumento acumulando un <strong>Flujo Máximo de 8 unidades</strong>.</p>
+            </div>
+        </section>
+
+        <!-- ═══ Parte b) Conservación de Flujos ═══ -->
+        <section class="part-section" id="p3b">
+            <div class="part-header">
+                <span class="part-badge">b</span>
+                <h3>Distribución Final y Conservación de Flujo</h3>
+            </div>
+
+            <table class="dijkstra-table">
+                <thead>
+                    <tr><th>Canal</th><th>Capacidad (c)</th><th>Flujo Final (f)</th><th>Capacidad Residual (c_f)</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                    <tr class="row-rejected"><td><strong>S → A</strong></td><td>5</td><td><strong>5</strong></td><td>0</td><td class="tie-breaker-note">✔ Saturado</td></tr>
+                    <tr class="row-rejected"><td><strong>S → B</strong></td><td>3</td><td><strong>3</strong></td><td>0</td><td class="tie-breaker-note">✔ Saturado</td></tr>
+                    <tr class="row-accepted"><td><strong>A → B</strong></td><td>2</td><td><strong>1</strong></td><td>1</td><td class="permanent">Parcial</td></tr>
+                    <tr class="row-rejected"><td><strong>A → T</strong></td><td>4</td><td><strong>4</strong></td><td>0</td><td class="tie-breaker-note">✔ Saturado</td></tr>
+                    <tr class="row-accepted"><td><strong>B → T</strong></td><td>5</td><td><strong>4</strong></td><td>1</td><td class="permanent">Parcial</td></tr>
+                </tbody>
+            </table>
+
+            <div class="step-block" style="margin-top:1.5rem;">
+                <h4>Verificación de la Ley de Conservación de Flujo:</h4>
+                <div class="equation-row">
+                    <div class="math-eq" data-latex="\sum f_{\text{in}}(A) = \sum f_{\text{out}}(A) \implies f(S, A) = f(A, T) + f(A, B) \implies 5 = 4 + 1 = 5 \quad \checkmark"></div>
+                </div>
+                <div class="equation-row">
+                    <div class="math-eq" data-latex="\sum f_{\text{in}}(B) = \sum f_{\text{out}}(B) \implies f(S, B) + f(A, B) = f(B, T) \implies 3 + 1 = 4 = 4 \quad \checkmark"></div>
+                </div>
+                <div class="equation-row">
+                    <div class="math-eq" data-latex="\text{Flujo Neto Saliente de } S = f(S, A) + f(S, B) = 5 + 3 = 8 = f(A, T) + f(B, T) = \text{Flujo Entrante a } T \quad \checkmark"></div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Respuesta b)</div>
+                <p>Todos los nodos intermedios cumplen rigurosamente la ley de conservación (flujo que entra = flujo que sale) y no se excede la capacidad de ningún canal (<span class="katex-inline" data-latex="0 \le f(e) \le c(e)"></span>).</p>
+            </div>
+        </section>
+
+        <!-- ═══ Parte c) Corte Mínimo y Dualidad ═══ -->
+        <section class="part-section" id="p3c">
+            <div class="part-header">
+                <span class="part-badge">c</span>
+                <h3>Demostración de Optimalidad con el Teorema del Corte Mínimo</h3>
+            </div>
+
+            <p>
+                Por el <strong>Teorema de Flujo Máximo - Corte Mínimo</strong> (Ford & Fulkerson, 1956), el valor de cualquier flujo factible es menor o igual a la capacidad de cualquier corte <span class="katex-inline" data-latex="(S_{\text{cut}}, T_{\text{cut}})"></span>. Si encontramos un corte cuya capacidad iguale el flujo actual, queda garantizada la optimalidad matemática absoluta.
+            </p>
+
+            <div class="step-block">
+                <h4>Identificación del Corte Mínimo a partir de la Red Residual Final:</h4>
+                <p>
+                    Tomamos <span class="katex-inline" data-latex="S_{\text{cut}}"></span> como el conjunto de vértices alcanzables desde <span class="katex-inline" data-latex="S"></span> en <span class="katex-inline" data-latex="G_f"></span>:
+                </p>
+                <div class="math-display" data-latex="S_{\text{cut}} = \{S\}, \qquad T_{\text{cut}} = \{A,\, B,\, T\}"></div>
+                <p>Los arcos dirigidos que cruzan desde <span class="katex-inline" data-latex="S_{\text{cut}}"></span> hacia <span class="katex-inline" data-latex="T_{\text{cut}}"></span> en la red original son:</p>
+                <ul>
+                    <li><span class="katex-inline" data-latex="(S, A)"></span> con capacidad <span class="katex-inline" data-latex="c(S, A) = 5"></span></li>
+                    <li><span class="katex-inline" data-latex="(S, B)"></span> con capacidad <span class="katex-inline" data-latex="c(S, B) = 3"></span></li>
+                </ul>
+                <div class="math-display" data-latex="C(S_{\text{cut}}, T_{\text{cut}}) = c(S, A) + c(S, B) = 5 + 3 = 8"></div>
+                <div class="result-box">
+                    <div class="math-display" data-latex="\boxed{\text{Flujo Máximo} = \text{Capacidad Corte Mínimo} = 8}"></div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Conclusión Final</div>
+                <p>
+                    El corte <span class="katex-inline" data-latex="(\{S\}, \{A, B, T\})"></span> forma el cuello de botella físico infranqueable de la red con capacidad <strong>8</strong>. Al ser alcanzado en su totalidad, se demuestra que <strong>8</strong> es la máxima cantidad física de flujo que la red puede transportar.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <!--  RESUMEN FINAL                                                  -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="summary-section" id="summary-section">
@@ -610,6 +861,9 @@
                 <tr><td><strong>2.a</strong></td><td>Dos rutas óptimas; latencia mínima de 16 ms</td></tr>
                 <tr><td><strong>2.b</strong></td><td>Nueva latencia: 17 ms; aumento del 6,25%</td></tr>
                 <tr><td><strong>2.c</strong></td><td>Mayor tolerancia a fallos, disponibilidad y posibilidad de balanceo de carga</td></tr>
+                <tr><td><strong>3.a</strong></td><td>Flujo máximo: 8 unidades mediante 3 caminos de aumento (Ford-Fulkerson)</td></tr>
+                <tr><td><strong>3.b</strong></td><td>Conservación cumplida en A (5 = 5) y B (4 = 4); canales S→A, S→B y A→T saturados</td></tr>
+                <tr><td><strong>3.c</strong></td><td>Corte mínimo: {S} vs {A, B, T} con capacidad 8 = Flujo Máximo (Optimalidad demostrada)</td></tr>
             </tbody>
         </table>
     </section>
