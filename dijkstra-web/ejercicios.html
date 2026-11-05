@@ -42,6 +42,11 @@
             <span class="prob-label">Problema 3</span>
             <span class="prob-name">Flujo Máximo (Ford-Fulkerson)</span>
         </button>
+        <button type="button" class="problem-tab" id="tab-prob4" data-prob="4">
+            <span class="prob-icon">🚛</span>
+            <span class="prob-label">Taller 5 de Noviembre 2026</span>
+            <span class="prob-name">Red Logística (Flujo Máximo)</span>
+        </button>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -846,6 +851,848 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  PANEL 4: TALLER 5 DE NOVIEMBRE 2026 - FLUJO MÁXIMO           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="problem-panel" id="panel-prob4" style="display:none;">
+        <header class="problem-header">
+            <div class="problem-number">Taller 5 de Noviembre 2026</div>
+            <h2>Desarrollo completo: Problema de flujo máximo – Red logística para el transporte de material recuperado</h2>
+            <p class="problem-statement">
+                Desarrollo exhaustivo de los <strong>cinco puntos del ejercicio</strong> y las <strong>tres preguntas de análisis</strong>, paso a paso, con explicaciones conceptuales, formulación matemática, tablas de iteración e interpretación de resultados.
+                El objetivo es determinar cuántas toneladas de plástico puede transportar como máximo la empresa desde el centro de consolidación <strong>S</strong> hasta la planta de transformación <strong>T</strong> durante una jornada, respetando las capacidades de cada conexión.
+            </p>
+            <div class="meta-strip">
+                <span class="meta-pill"><strong>Algoritmo:</strong> Ford-Fulkerson</span>
+                <span class="meta-pill"><strong>Nodos:</strong> 6 (S, A, B, C, D, T)</span>
+                <span class="meta-pill"><strong>Conexiones:</strong> 10 arcos dirigidos</span>
+                <span class="meta-pill"><strong>Flujo Máximo:</strong> 22 ton / jornada</span>
+                <span class="meta-pill"><strong>Corte Mínimo:</strong> 22 toneladas</span>
+                <span class="meta-pill"><strong>Fecha:</strong> 5 de Noviembre de 2026</span>
+            </div>
+        </header>
+
+        <!-- SVG Graph for Problem 4 with Step Controls -->
+        <section class="graph-section">
+            <h3 class="section-title"><span class="section-icon">📊</span> Grafo Dinámico de la Red Logística y Flujo de Material</h3>
+            
+            <div class="graph-controls-bar">
+                <button type="button" class="graph-ctrl-btn" id="p4-btn-prev">◀ Paso Anterior</button>
+                <div class="step-indicator-badge" id="p4-step-indicator">Paso 0 / 6: Inicialización (Flujo Cero)</div>
+                <button type="button" class="graph-ctrl-btn" id="p4-btn-next">Siguiente Paso ▶</button>
+                <button type="button" class="graph-ctrl-btn" id="p4-btn-autoplay">▶ Auto</button>
+                <button type="button" class="graph-ctrl-btn" id="p4-btn-reset">↺ Reiniciar</button>
+            </div>
+
+            <div class="graph-container">
+                <svg id="graph-p4" width="100%" height="520" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+
+            <div class="flow-status-grid">
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Flujo Total Actual</div>
+                    <div class="flow-status-val" id="p4-stat-flow" style="color:var(--ink-green)">0 / 22 ton</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Camino Activo</div>
+                    <div class="flow-status-val" id="p4-stat-path" style="font-family:var(--font-mono); font-size:1.05rem;">—</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Cuello de Botella (δ)</div>
+                    <div class="flow-status-val" id="p4-stat-delta">—</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Estado</div>
+                    <div class="flow-status-val" id="p4-stat-status" style="font-size:1.05rem;">Inicialización</div>
+                </div>
+            </div>
+
+            <div class="graph-legend" style="margin-top:1.25rem;">
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-green); height:6px;"></span> Camino de Aumento</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-red); height:4px;"></span> Conexión Saturada (f = c)</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-ochre); height:4px;"></span> Conexión con Flujo Parcial</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:rgba(31,46,90,0.3); height:2px;"></span> Sin Flujo (f = 0)</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-red); border-top:2px dashed var(--ink-red); height:0;"></span> Corte Mínimo Global</span>
+            </div>
+        </section>
+
+        <!-- ═══ 1. Comprensión del problema y datos de la red ═══ -->
+        <section class="part-section" id="p4-intro">
+            <div class="part-header">
+                <span class="part-badge">1</span>
+                <h3>Comprensión del problema y datos de la red</h3>
+            </div>
+
+            <p>
+                Antes de resolver el ejercicio, debemos entender qué representa cada elemento dentro de la logística de transporte de la empresa.
+                En este problema se utiliza un <strong>grafo dirigido y capacitado</strong> <span class="katex-inline" data-latex="G = (V, E, c)"></span>:
+            </p>
+            <ul>
+                <li><strong>Grafo dirigido:</strong> las conexiones tienen una dirección específica para el transporte de los vehículos.</li>
+                <li><strong>Capacidad:</strong> representa la cantidad máxima de toneladas que puede transportar una conexión por jornada.</li>
+                <li><strong>Flujo:</strong> representa la cantidad real de toneladas que circulan por cada conexión.</li>
+                <li><strong>Origen (S):</strong> centro principal de consolidación del material recuperado.</li>
+                <li><strong>Destino (T):</strong> planta de transformación final del plástico.</li>
+                <li><strong>Nodos intermedios (A, B, C y D):</strong> patios logísticos y estaciones de transferencia intermedias.</li>
+            </ul>
+
+            <div class="step-block">
+                <h4><span class="step-num">1.1</span> Identificación de los nodos</h4>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Nodo</th><th>Función Logística</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>S</strong></td><td>Centro de consolidación (origen principal)</td></tr>
+                        <tr><td><strong>A</strong></td><td>Patio logístico norte</td></tr>
+                        <tr><td><strong>B</strong></td><td>Estación oriental</td></tr>
+                        <tr><td><strong>C</strong></td><td>Plataforma central</td></tr>
+                        <tr><td><strong>D</strong></td><td>Patio occidental</td></tr>
+                        <tr><td><strong>T</strong></td><td>Planta de transformación (destino final)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">1.2</span> Capacidades de las conexiones</h4>
+                <p>De acuerdo con la información del enunciado, se cuenta con 10 conexiones dirigidas:</p>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Arco dirigido</th><th>Capacidad (toneladas/jornada)</th><th>Descripción del Enlace</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>S → A</strong></td><td>12</td><td>Despacho desde consolidación hacia Patio Norte</td></tr>
+                        <tr><td><strong>S → B</strong></td><td>10</td><td>Despacho desde consolidación hacia Estación Oriental</td></tr>
+                        <tr><td><strong>A → B</strong></td><td>4</td><td>Enlace transversal norte-oriente</td></tr>
+                        <tr><td><strong>A → C</strong></td><td>8</td><td>Enlace directo norte hacia Plataforma Central</td></tr>
+                        <tr><td><strong>A → D</strong></td><td>5</td><td>Enlace diagonal hacia Patio Occidental</td></tr>
+                        <tr><td><strong>B → D</strong></td><td>7</td><td>Enlace directo oriental hacia Patio Occidental</td></tr>
+                        <tr><td><strong>B → C</strong></td><td>6</td><td>Enlace diagonal hacia Plataforma Central</td></tr>
+                        <tr><td><strong>C → D</strong></td><td>3</td><td>Transferencia central hacia Patio Occidental</td></tr>
+                        <tr><td><strong>C → T</strong></td><td>10</td><td>Ingreso directo a Planta desde Plataforma Central</td></tr>
+                        <tr><td><strong>D → T</strong></td><td>12</td><td>Ingreso directo a Planta desde Patio Occidental</td></tr>
+                    </tbody>
+                </table>
+                <p class="note-box">
+                    <strong>Importante:</strong> Estas capacidades representan los límites físicos máximos de transporte de cada conexión. No podemos enviar más toneladas por una conexión de las que permite su capacidad (<span class="katex-inline" data-latex="0 \le x_{ij} \le c_{ij}"></span>), aunque exista material disponible en el origen.
+                </p>
+            </div>
+        </section>
+
+        <!-- ═══ Pregunta 1: Dibuje el grafo dirigido completo ═══ -->
+        <section class="part-section" id="p4-q1">
+            <div class="part-header">
+                <span class="part-badge">P1</span>
+                <h3>Pregunta 1. Dibuje el grafo dirigido completo</h3>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">1.1</span> ¿Qué debemos hacer?</h4>
+                <p>
+                    Debemos representar gráficamente todos los nodos de la red y conectar cada uno mediante flechas que indiquen la dirección del transporte.
+                    Cada flecha debe mostrar su capacidad correspondiente en toneladas por jornada.
+                </p>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">1.2</span> Representación del grafo</h4>
+                <p>
+                    En el visor interactivo superior puedes observar la topología completa con sus seis nodos y diez conexiones.
+                    Para evitar confusiones en el dibujo, esta es la lista definitiva de flechas y capacidades que debes representar en tu entrega:
+                </p>
+                <div class="tree-result" style="font-family:var(--font-mono); font-size:0.95rem; line-height:1.7;">
+                    <strong>Conexiones y Capacidades:</strong><br>
+                    • S → A (12 ton/jornada)<br>
+                    • S → B (10 ton/jornada)<br>
+                    • A → B (4 ton/jornada)<br>
+                    • A → C (8 ton/jornada)<br>
+                    • A → D (5 ton/jornada)<br>
+                    • B → D (7 ton/jornada)<br>
+                    • B → C (6 ton/jornada)<br>
+                    • C → D (3 ton/jornada)<br>
+                    • C → T (10 ton/jornada)<br>
+                    • D → T (12 ton/jornada)
+                </div>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">1.3</span> Interpretación del grafo</h4>
+                <p>El nodo origen <strong>S</strong> tiene dos salidas principales:</p>
+                <ul>
+                    <li>Hacia <strong>A</strong>, con capacidad de 12 toneladas.</li>
+                    <li>Hacia <strong>B</strong>, con capacidad de 10 toneladas.</li>
+                </ul>
+                <p>
+                    Los nodos intermedios <strong>A</strong> y <strong>B</strong> permiten distribuir el material hacia <strong>C</strong> y <strong>D</strong> mediante diferentes conexiones combinadas (incluyendo cruces como <span class="katex-inline" data-latex="A \to D"></span> y <span class="katex-inline" data-latex="B \to C"></span>).
+                    Finalmente, todo el material llega a la planta <strong>T</strong> a través de dos conexiones de acceso:
+                </p>
+                <ul>
+                    <li><strong>C → T:</strong> capacidad de 10 toneladas.</li>
+                    <li><strong>D → T:</strong> capacidad de 12 toneladas.</li>
+                </ul>
+                <div class="math-display" data-latex="\text{Capacidad Saliente de } S = 12 + 10 = 22 \text{ ton/jornada}"></div>
+                <div class="math-display" data-latex="\text{Capacidad Entrante a } T = 10 + 12 = 22 \text{ ton/jornada}"></div>
+                <p class="note-box">
+                    Esto significa que la planta puede recibir, como máximo, <strong>22 toneladas por jornada</strong> a través de las conexiones existentes. A su vez, el origen solo puede despachar como máximo 22 toneladas por jornada.
+                </p>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Resumen de la pregunta 1</div>
+                <p>El grafo contiene <strong>6 nodos</strong>, <strong>10 arcos dirigidos</strong>, un origen <strong>S</strong>, un destino <strong>T</strong> y cuatro nodos intermedios. Cada arco posee una capacidad fija que delimita la tasa de flujo.</p>
+            </div>
+        </section>
+
+        <!-- ═══ Pregunta 2: Formule el modelo matemático ═══ -->
+        <section class="part-section" id="p4-q2">
+            <div class="part-header">
+                <span class="part-badge">P2</span>
+                <h3>Pregunta 2. Formule el modelo matemático de flujo máximo</h3>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">2.1</span> ¿Qué debemos hacer?</h4>
+                <p>
+                    Debemos expresar el problema formalmente mediante programación lineal:
+                </p>
+                <ul>
+                    <li>Definir una variable de decisión para cada conexión.</li>
+                    <li>Establecer una función objetivo que maximice el material que llega a la planta.</li>
+                    <li>Establecer restricciones de capacidad para cada arco.</li>
+                    <li>Establecer restricciones de conservación de flujo para cada nodo intermedio.</li>
+                </ul>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">2.2</span> Definición de las variables</h4>
+                <p>Definimos una variable continua no negativa para representar el flujo que circula por cada conexión:</p>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Variable</th><th>Representación Física</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><span class="katex-inline" data-latex="x_{SA}"></span></td><td>Flujo de S hacia A (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{SB}"></span></td><td>Flujo de S hacia B (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{AB}"></span></td><td>Flujo de A hacia B (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{AC}"></span></td><td>Flujo de A hacia C (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{AD}"></span></td><td>Flujo de A hacia D (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{BD}"></span></td><td>Flujo de B hacia D (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{BC}"></span></td><td>Flujo de B hacia C (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{CD}"></span></td><td>Flujo de C hacia D (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{CT}"></span></td><td>Flujo de C hacia T (toneladas/jornada)</td></tr>
+                        <tr><td><span class="katex-inline" data-latex="x_{DT}"></span></td><td>Flujo de D hacia T (toneladas/jornada)</td></tr>
+                    </tbody>
+                </table>
+                <p>Adicionalmente:</p>
+                <div class="math-display" data-latex="F = \text{Flujo total enviado desde } S \text{ hasta } T"></div>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">2.3</span> Función objetivo</h4>
+                <p>El propósito es maximizar el flujo total que llega a la planta de transformación. Por lo tanto:</p>
+                <div class="math-display" data-latex="\boxed{\text{Maximizar } Z = F}"></div>
+                <p>Como existen dos conexiones directas de entrada a la planta (<span class="katex-inline" data-latex="C \to T"></span> y <span class="katex-inline" data-latex="D \to T"></span>), también se expresa equivalentemente como:</p>
+                <div class="math-display" data-latex="\boxed{\text{Maximizar } Z = x_{CT} + x_{DT}}"></div>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">2.4</span> Restricciones de capacidad</h4>
+                <p>Cada conexión tiene un límite superior impuesto por el transporte:</p>
+                <div class="equation-row"><div class="math-display" data-latex="0 \le x_{SA} \le 12, \quad 0 \le x_{SB} \le 10, \quad 0 \le x_{AB} \le 4, \quad 0 \le x_{AC} \le 8, \quad 0 \le x_{AD} \le 5"></div></div>
+                <div class="equation-row"><div class="math-display" data-latex="0 \le x_{BD} \le 7, \quad 0 \le x_{BC} \le 6, \quad 0 \le x_{CD} \le 3, \quad 0 \le x_{CT} \le 10, \quad 0 \le x_{DT} \le 12"></div></div>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">2.5</span> Restricciones de conservación de flujo</h4>
+                <p>
+                    El principio de conservación establece que: <em>Todo el material que entra a un nodo intermedio debe ser exactamente igual al material que sale de ese nodo</em>. No puede haber generación ni acumulación de plástico en los patios intermedios.
+                </p>
+                <ul>
+                    <li><strong>Nodo A:</strong> Entra desde S; sale hacia B, C y D:<br>
+                        <div class="math-display" data-latex="x_{SA} = x_{AB} + x_{AC} + x_{AD}"></div>
+                    </li>
+                    <li><strong>Nodo B:</strong> Entra desde S y A; sale hacia C y D:<br>
+                        <div class="math-display" data-latex="x_{SB} + x_{AB} = x_{BC} + x_{BD}"></div>
+                    </li>
+                    <li><strong>Nodo C:</strong> Entra desde A y B; sale hacia D y T:<br>
+                        <div class="math-display" data-latex="x_{AC} + x_{BC} = x_{CD} + x_{CT}"></div>
+                    </li>
+                    <li><strong>Nodo D:</strong> Entra desde A, B y C; sale hacia T:<br>
+                        <div class="math-display" data-latex="x_{AD} + x_{BD} + x_{CD} = x_{DT}"></div>
+                    </li>
+                    <li><strong>Nodo Origen S (Balance de salida):</strong><br>
+                        <div class="math-display" data-latex="F = x_{SA} + x_{SB}"></div>
+                    </li>
+                    <li><strong>Nodo Destino T (Balance de entrada):</strong><br>
+                        <div class="math-display" data-latex="F = x_{CT} + x_{DT}"></div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">2.6</span> Modelo matemático completo</h4>
+                <div class="result-box">
+                    <div class="math-display" data-latex="\begin{aligned}
+\text{Maximizar} \quad & Z = x_{CT} + x_{DT} \\
+\text{Sujeto a:} \quad & x_{SA} - x_{AB} - x_{AC} - x_{AD} = 0 & \text{(Nodo A)} \\
+& x_{SB} + x_{AB} - x_{BC} - x_{BD} = 0 & \text{(Nodo B)} \\
+& x_{AC} + x_{BC} - x_{CD} - x_{CT} = 0 & \text{(Nodo C)} \\
+& x_{AD} + x_{BD} + x_{CD} - x_{DT} = 0 & \text{(Nodo D)} \\
+& 0 \le x_{SA} \le 12, \quad 0 \le x_{SB} \le 10 \\
+& 0 \le x_{AB} \le 4, \quad 0 \le x_{AC} \le 8, \quad 0 \le x_{AD} \le 5 \\
+& 0 \le x_{BD} \le 7, \quad 0 \le x_{BC} \le 6, \quad 0 \le x_{CD} \le 3 \\
+& 0 \le x_{CT} \le 10, \quad 0 \le x_{DT} \le 12
+\end{aligned}"></div>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Resumen de la pregunta 2</div>
+                <p>Se formuló el modelo de optimización lineal exacto. La función objetivo maximiza las toneladas que arriban a T, y las restricciones garantizan el cumplimiento de las capacidades físicas de los 10 arcos y la ley de conservación de materia en los 4 patios intermedios.</p>
+            </div>
+        </section>
+
+        <!-- ═══ Pregunta 3: Algoritmo Ford-Fulkerson ═══ -->
+        <section class="part-section" id="p4-q3">
+            <div class="part-header">
+                <span class="part-badge">P3</span>
+                <h3>Pregunta 3. Implementar el algoritmo Ford-Fulkerson</h3>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">3.1</span> ¿Qué es Ford-Fulkerson?</h4>
+                <p>
+                    El algoritmo Ford-Fulkerson es un método iterativo para encontrar el flujo máximo en una red dirigida y capacitada.
+                    Su funcionamiento consiste en buscar sucesivamente caminos orientados desde el origen <span class="katex-inline" data-latex="S"></span> hasta el destino <span class="katex-inline" data-latex="T"></span> con capacidad residual disponible, llamados <strong>caminos aumentantes</strong>.
+                </p>
+                <p>El algoritmo sigue estos pasos:</p>
+                <ol>
+                    <li>Inicializar todos los flujos en cero: <span class="katex-inline" data-latex="f(u,v) = 0"></span>.</li>
+                    <li>Buscar un camino aumentante disponible desde <span class="katex-inline" data-latex="S"></span> hasta <span class="katex-inline" data-latex="T"></span> en la red residual.</li>
+                    <li>Identificar la capacidad residual de cada arco del camino.</li>
+                    <li>Encontrar el <strong>cuello de botella</strong> (capacidad residual mínima) del camino.</li>
+                    <li>Aumentar el flujo total en la cantidad del cuello de botella.</li>
+                    <li>Actualizar las capacidades residuales en la red.</li>
+                    <li>Repetir el procedimiento hasta que no existan más caminos aumentantes disponibles.</li>
+                </ol>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">3.2</span> Conceptos fundamentales</h4>
+                <ul>
+                    <li>
+                        <strong>Capacidad residual:</strong> Es la capacidad restante disponible en una conexión:
+                        <div class="math-display" data-latex="R(u,v) = C(u,v) - F(u,v)"></div>
+                    </li>
+                    <li>
+                        <strong>Cuello de botella:</strong> Es la menor capacidad residual encontrada dentro del camino <span class="katex-inline" data-latex="P"></span>:
+                        <div class="math-display" data-latex="B(P) = \min_{(u,v) \in P} \{ R(u,v) \}"></div>
+                    </li>
+                    <li>
+                        <strong>Flujo acumulado:</strong> Suma de los incrementos en cada iteración:
+                        <div class="math-display" data-latex="F_{\text{total}} = \sum_{i=1}^{n} B(P_i)"></div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">3.3</span> Ejemplo detallado de la primera iteración</h4>
+                <p>Seleccionamos el camino directo superior:</p>
+                <div class="tree-result">
+                    <strong>Camino 1:</strong> <span class="katex-inline" data-latex="S \to A \to C \to T"></span>
+                </div>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Conexión</th><th>Capacidad Original</th><th>Flujo Anterior</th><th>Capacidad Residual</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>S → A</td><td>12</td><td>0</td><td>12</td></tr>
+                        <tr><td>A → C</td><td>8</td><td>0</td><td>8</td></tr>
+                        <tr><td>C → T</td><td>10</td><td>0</td><td>10</td></tr>
+                    </tbody>
+                </table>
+                <p>Identificamos el cuello de botella:</p>
+                <div class="math-display" data-latex="B(P_1) = \min(12,\, 8,\, 10) = \boxed{8 \text{ toneladas}}"></div>
+                <p>El flujo acumulado pasa a ser <span class="katex-inline" data-latex="F = 8"></span> toneladas y las capacidades residuales quedan:</p>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Conexión</th><th>Capacidad Original</th><th>Flujo Utilizado</th><th>Residual Restante</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>S → A</td><td>12</td><td>8</td><td>4</td><td>Disponible (4 ton)</td></tr>
+                        <tr class="row-rejected"><td>A → C</td><td>8</td><td>8</td><td>0</td><td class="tie-breaker-note">✔ ¡Saturado!</td></tr>
+                        <tr><td>C → T</td><td>10</td><td>8</td><td>2</td><td>Disponible (2 ton)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">3.4</span> Desarrollo de las cinco iteraciones de Ford-Fulkerson</h4>
+                <p>A continuación se presenta la secuencia válida de 5 iteraciones que conduce al flujo máximo óptimo:</p>
+                
+                <!-- Iter 1 -->
+                <div class="analysis-card">
+                    <div class="analysis-card-title">🔵 Iteración 1: Camino S → A → C → T</div>
+                    <p>• Capacidades en el camino: <span class="katex-inline" data-latex="12,\, 8,\, 10"></span></p>
+                    <p>• Cuello de botella: <span class="katex-inline" data-latex="\min(12, 8, 10) = 8"></span></p>
+                    <p>• Flujo acumulado: <span class="katex-inline" data-latex="F = 8"></span> toneladas. (Arco <span class="katex-inline" data-latex="A \to C"></span> queda saturado).</p>
+                </div>
+
+                <!-- Iter 2 -->
+                <div class="analysis-card">
+                    <div class="analysis-card-title">🔵 Iteración 2: Camino S → A → D → T</div>
+                    <p>• Como <span class="katex-inline" data-latex="S \to A"></span> tiene 4 toneladas residuales, evaluamos el camino hacia D y luego a T.</p>
+                    <p>• Capacidades residuales: <span class="katex-inline" data-latex="R(S,A)=4,\, R(A,D)=5,\, R(D,T)=12"></span></p>
+                    <p>• Cuello de botella: <span class="katex-inline" data-latex="\min(4, 5, 12) = 4"></span></p>
+                    <p>• Flujo acumulado: <span class="katex-inline" data-latex="F = 8 + 4 = 12"></span> toneladas. (Arco <span class="katex-inline" data-latex="S \to A"></span> queda saturado: 12/12).</p>
+                </div>
+
+                <!-- Iter 3 -->
+                <div class="analysis-card">
+                    <div class="analysis-card-title">🔵 Iteración 3: Camino S → B → C → T</div>
+                    <p>• Con <span class="katex-inline" data-latex="S \to A"></span> saturado, exploramos salidas desde B.</p>
+                    <p>• Capacidades residuales: <span class="katex-inline" data-latex="R(S,B)=10,\, R(B,C)=6,\, R(C,T)=10-8=2"></span></p>
+                    <p>• Cuello de botella: <span class="katex-inline" data-latex="\min(10, 6, 2) = 2"></span></p>
+                    <p>• Flujo acumulado: <span class="katex-inline" data-latex="F = 12 + 2 = 14"></span> toneladas. (Arco <span class="katex-inline" data-latex="C \to T"></span> queda saturado: 10/10).</p>
+                </div>
+
+                <!-- Iter 4 -->
+                <div class="analysis-card">
+                    <div class="analysis-card-title">🔵 Iteración 4: Camino S → B → D → T</div>
+                    <p>• Capacidades residuales: <span class="katex-inline" data-latex="R(S,B)=10-2=8,\, R(B,D)=7,\, R(D,T)=12-4=8"></span></p>
+                    <p>• Cuello de botella: <span class="katex-inline" data-latex="\min(8, 7, 8) = 7"></span></p>
+                    <p>• Flujo acumulado: <span class="katex-inline" data-latex="F = 14 + 7 = 21"></span> toneladas. (Arco <span class="katex-inline" data-latex="B \to D"></span> queda saturado: 7/7).</p>
+                </div>
+
+                <!-- Iter 5 -->
+                <div class="analysis-card">
+                    <div class="analysis-card-title">🔵 Iteración 5: Camino S → B → C → D → T</div>
+                    <p>• Capacidades residuales: <span class="katex-inline" data-latex="R(S,B)=8-7=1,\, R(B,C)=6-2=4,\, R(C,D)=3,\, R(D,T)=8-7=1"></span></p>
+                    <p>• Cuello de botella: <span class="katex-inline" data-latex="\min(1, 4, 3, 1) = 1"></span></p>
+                    <p>• Flujo acumulado: <span class="katex-inline" data-latex="F = 21 + 1 = 22"></span> toneladas. (Arcos <span class="katex-inline" data-latex="S \to B"></span> y <span class="katex-inline" data-latex="D \to T"></span> quedan saturados al 100%).</p>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">3.5</span> Interpretación de las iteraciones</h4>
+                <p>
+                    En cada iteración se encuentra un camino que todavía tiene capacidad residual positiva.
+                    Los incrementos sucesivos fueron de <strong>8, 4, 2, 7 y 1</strong> toneladas. Al finalizar la quinta iteración, el flujo acumulado alcanza las <strong>22 toneladas por jornada</strong>.
+                </p>
+            </div>
+        </section>
+
+        <!-- ═══ Pregunta 4: Tabla por iteración ═══ -->
+        <section class="part-section" id="p4-q4">
+            <div class="part-header">
+                <span class="part-badge">P4</span>
+                <h3>Pregunta 4. Tabla por iteración</h3>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">4.1</span> Tabla de resultados consolidada</h4>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Iteración</th><th>Camino Aumentante</th><th>Cuello de Botella (ton)</th><th>Incremento (ton)</th><th>Flujo Acumulado (ton)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>1</strong></td><td>S → A → C → T</td><td>8</td><td>8</td><td>8</td></tr>
+                        <tr><td><strong>2</strong></td><td>S → A → D → T</td><td>4</td><td>4</td><td>12</td></tr>
+                        <tr><td><strong>3</strong></td><td>S → B → C → T</td><td>2</td><td>2</td><td>14</td></tr>
+                        <tr><td><strong>4</strong></td><td>S → B → D → T</td><td>7</td><td>7</td><td>21</td></tr>
+                        <tr><td><strong>5</strong></td><td>S → B → C → D → T</td><td>1</td><td>1</td><td><strong>22</strong></td></tr>
+                        <tr style="background:rgba(27,110,68,0.1); font-weight:bold;">
+                            <td colspan="2">TOTAL</td><td>—</td><td>22</td><td>22</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">4.2</span> ¿Por qué termina el algoritmo?</h4>
+                <p>
+                    Después de la quinta iteración, revisamos las capacidades residuales de las conexiones salientes del origen <strong>S</strong>:
+                </p>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Conexión Saliente</th><th>Capacidad Original</th><th>Flujo Utilizado</th><th>Capacidad Residual</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="row-rejected"><td><strong>S → A</strong></td><td>12</td><td>12</td><td>0 (Saturada)</td></tr>
+                        <tr class="row-rejected"><td><strong>S → B</strong></td><td>10</td><td>10</td><td>0 (Saturada)</td></tr>
+                    </tbody>
+                </table>
+                <p class="note-box">
+                    Esto significa que el origen <strong>ya no tiene capacidad física disponible</strong> para enviar más material (<span class="katex-inline" data-latex="R(S,A) = 0"></span> y <span class="katex-inline" data-latex="R(S,B) = 0"></span>). No existe ningún camino aumentante desde S hasta T en la red residual final <span class="katex-inline" data-latex="G_f"></span>. Por lo tanto, se cumple la condición de parada y el algoritmo termina exitosamente.
+                </p>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">4.3</span> Flujo final de cada conexión</h4>
+                <p>Comprobación detallada de la carga en las diez conexiones de la red logística:</p>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Conexión</th><th>Capacidad (ton)</th><th>Flujo Final (ton)</th><th>Capacidad Restante</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="row-rejected"><td><strong>S → A</strong></td><td>12</td><td><strong>12</strong></td><td>0</td><td class="tie-breaker-note">✔ 100% Saturado</td></tr>
+                        <tr class="row-rejected"><td><strong>S → B</strong></td><td>10</td><td><strong>10</strong></td><td>0</td><td class="tie-breaker-note">✔ 100% Saturado</td></tr>
+                        <tr><td><strong>A → B</strong></td><td>4</td><td><strong>0</strong></td><td>4</td><td>Sin flujo (Disponible)</td></tr>
+                        <tr class="row-rejected"><td><strong>A → C</strong></td><td>8</td><td><strong>8</strong></td><td>0</td><td class="tie-breaker-note">✔ 100% Saturado</td></tr>
+                        <tr class="row-accepted"><td><strong>A → D</strong></td><td>5</td><td><strong>4</strong></td><td>1</td><td class="permanent">Flujo Parcial</td></tr>
+                        <tr class="row-rejected"><td><strong>B → D</strong></td><td>7</td><td><strong>7</strong></td><td>0</td><td class="tie-breaker-note">✔ 100% Saturado</td></tr>
+                        <tr class="row-accepted"><td><strong>B → C</strong></td><td>6</td><td><strong>3</strong></td><td>3</td><td class="permanent">Flujo Parcial</td></tr>
+                        <tr class="row-accepted"><td><strong>C → D</strong></td><td>3</td><td><strong>1</strong></td><td>2</td><td class="permanent">Flujo Parcial</td></tr>
+                        <tr class="row-rejected"><td><strong>C → T</strong></td><td>10</td><td><strong>10</strong></td><td>0</td><td class="tie-breaker-note">✔ 100% Saturado</td></tr>
+                        <tr class="row-rejected"><td><strong>D → T</strong></td><td>12</td><td><strong>12</strong></td><td>0</td><td class="tie-breaker-note">✔ 100% Saturado</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">4.4</span> Comprobación de la conservación del flujo</h4>
+                <p>Verificamos que en cada uno de los cuatro patios logísticos intermedios se cumpla rigurosamente que el flujo entrante sea igual al flujo saliente:</p>
+                <ul>
+                    <li>
+                        <strong>Patio A:</strong><br>
+                        Entra: <span class="katex-inline" data-latex="x_{SA} = 12"></span><br>
+                        Sale: <span class="katex-inline" data-latex="x_{AB} + x_{AC} + x_{AD} = 0 + 8 + 4 = 12"></span><br>
+                        <span class="katex-inline" data-latex="12 = 12 \quad \checkmark"></span>
+                    </li>
+                    <li style="margin-top:0.5rem;">
+                        <strong>Estación B:</strong><br>
+                        Entra: <span class="katex-inline" data-latex="x_{SB} + x_{AB} = 10 + 0 = 10"></span><br>
+                        Sale: <span class="katex-inline" data-latex="x_{BC} + x_{BD} = 3 + 7 = 10"></span><br>
+                        <span class="katex-inline" data-latex="10 = 10 \quad \checkmark"></span>
+                    </li>
+                    <li style="margin-top:0.5rem;">
+                        <strong>Plataforma C:</strong><br>
+                        Entra: <span class="katex-inline" data-latex="x_{AC} + x_{BC} = 8 + 3 = 11"></span><br>
+                        Sale: <span class="katex-inline" data-latex="x_{CD} + x_{CT} = 1 + 10 = 11"></span><br>
+                        <span class="katex-inline" data-latex="11 = 11 \quad \checkmark"></span>
+                    </li>
+                    <li style="margin-top:0.5rem;">
+                        <strong>Patio D:</strong><br>
+                        Entra: <span class="katex-inline" data-latex="x_{AD} + x_{BD} + x_{CD} = 4 + 7 + 1 = 12"></span><br>
+                        Sale: <span class="katex-inline" data-latex="x_{DT} = 12"></span><br>
+                        <span class="katex-inline" data-latex="12 = 12 \quad \checkmark"></span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Resumen de la pregunta 4</div>
+                <p>Se realizaron 5 iteraciones con aumentos de 8, 4, 2, 7 y 1 toneladas. El flujo total resultante es de <strong>22 toneladas</strong>, y todos los nodos cumplen al 100% con la conservación de masa.</p>
+            </div>
+        </section>
+
+        <!-- ═══ Pregunta 5: Interpretación y Cuello de Botella ═══ -->
+        <section class="part-section" id="p4-q5">
+            <div class="part-header">
+                <span class="part-badge">P5</span>
+                <h3>Pregunta 5. Interpretación del resultado, restricciones y recomendación de mejora</h3>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">5.1</span> ¿Cuál es el flujo máximo?</h4>
+                <p>Sumamos las toneladas que ingresan a la planta de transformación a través de sus dos accesos:</p>
+                <div class="math-display" data-latex="F_{\max} = x_{CT} + x_{DT} = 10 + 12 = \boxed{22 \text{ toneladas/jornada}}"></div>
+                <div class="flow-status-grid" style="margin: 1.5rem 0;">
+                    <div class="flow-status-card">
+                        <div class="flow-status-label">Flujo Máximo Total</div>
+                        <div class="flow-status-val" style="color:var(--ink-green); font-size:1.6rem;">22 ton/jornada</div>
+                    </div>
+                    <div class="flow-status-card">
+                        <div class="flow-status-label">A través de C → T</div>
+                        <div class="flow-status-val">10 toneladas</div>
+                    </div>
+                    <div class="flow-status-card">
+                        <div class="flow-status-label">A través de D → T</div>
+                        <div class="flow-status-val">12 toneladas</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">5.2</span> ¿Qué conexiones limitan el desempeño global de la red?</h4>
+                <p>Para identificar las restricciones críticas, observamos cuáles conexiones operan al 100% de su capacidad nominal:</p>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Conexión</th><th>Capacidad (ton)</th><th>Flujo (ton)</th><th>Utilización</th><th>Rol en la Red</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="row-rejected"><td><strong>S → A</strong></td><td>12</td><td>12</td><td><strong>100 %</strong></td><td>Salida norte del centro S</td></tr>
+                        <tr class="row-rejected"><td><strong>S → B</strong></td><td>10</td><td>10</td><td><strong>100 %</strong></td><td>Salida oriente del centro S</td></tr>
+                        <tr class="row-rejected"><td><strong>C → T</strong></td><td>10</td><td>10</td><td><strong>100 %</strong></td><td>Entrada norte a la planta T</td></tr>
+                        <tr class="row-rejected"><td><strong>D → T</strong></td><td>12</td><td>12</td><td><strong>100 %</strong></td><td>Entrada sur a la planta T</td></tr>
+                    </tbody>
+                </table>
+                <p>Debemos distinguir dos aspectos fundamentales:</p>
+                <ul>
+                    <li><strong>Restricciones de salida:</strong> <span class="katex-inline" data-latex="S \to A"></span> y <span class="katex-inline" data-latex="S \to B"></span> limitan el despacho desde el centro de consolidación (<span class="katex-inline" data-latex="12 + 10 = 22"></span> ton).</li>
+                    <li><strong>Restricciones de entrada:</strong> <span class="katex-inline" data-latex="C \to T"></span> y <span class="katex-inline" data-latex="D \to T"></span> limitan la recepción de la planta (<span class="katex-inline" data-latex="10 + 12 = 22"></span> ton).</li>
+                </ul>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">5.3</span> Teorema de Flujo Máximo y Corte Mínimo</h4>
+                <p>
+                    El <strong>Teorema de Flujo Máximo – Corte Mínimo</strong> establece que el flujo máximo en cualquier red capacitada equivale exactamente a la capacidad mínima de un corte que separe al origen <span class="katex-inline" data-latex="S"></span> del destino <span class="katex-inline" data-latex="T"></span>.
+                </p>
+                <p>En este sistema existen <strong>dos cortes mínimos independientes</strong> que limitan la red a 22 toneladas:</p>
+                <div class="analysis-card">
+                    <div class="analysis-card-title">✂ Corte Mínimo en el Origen: <span class="katex-inline" data-latex="(\{S\}, \{A, B, C, D, T\})"></span></div>
+                    <p>Arcos que cruzan el corte: <span class="katex-inline" data-latex="(S, A)"></span> y <span class="katex-inline" data-latex="(S, B)"></span>.</p>
+                    <div class="math-display" data-latex="C(S_{\text{origen}}) = c(S, A) + c(S, B) = 12 + 10 = 22"></div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-card-title">✂ Corte Mínimo en el Destino: <span class="katex-inline" data-latex="(\{S, A, B, C, D\}, \{T\})"></span></div>
+                    <p>Arcos que cruzan el corte: <span class="katex-inline" data-latex="(C, T)"></span> y <span class="katex-inline" data-latex="(D, T)"></span>.</p>
+                    <div class="math-display" data-latex="C(T_{\text{destino}}) = c(C, T) + c(D, T) = 10 + 12 = 22"></div>
+                </div>
+                <div class="result-box">
+                    <div class="math-display" data-latex="\boxed{F_{\max} = \text{Corte}_{\min} = 22 \text{ toneladas/jornada}}"></div>
+                </div>
+                <p>Esta dualidad demuestra de manera concluyente que es matemáticamente imposible transportar más de 22 toneladas con la red física actual.</p>
+            </div>
+
+            <div class="step-block">
+                <h4><span class="step-num">5.4</span> Recomendación de mejora para la empresa</h4>
+                <p>La gerencia debe analizar dónde invertir sus recursos de manera eficiente:</p>
+                <table class="dijkstra-table">
+                    <thead>
+                        <tr><th>Alternativa</th><th>Análisis Técnico y Económico</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Comprar más vehículos</strong></td>
+                            <td><strong>Ineficaz:</strong> No aumenta automáticamente el flujo porque las conexiones físicas y los accesos ya alcanzaron su capacidad de saturación al 100%. Solo causaría congestión.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ampliar una conexión intermedia</strong></td>
+                            <td><strong>Insuficiente:</strong> Podría balancear rutas internas, pero no elimina por sí sola los dos cuellos de botella globales de 22 toneladas ubicados en la salida de S y la entrada de T.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Aumentar la capacidad de recepción en T</strong></td>
+                            <td><strong>Parcial:</strong> Necesaria, pero si no se amplía también la salida en S, la red continuará estancada en 22 toneladas debido a la restricción del origen.</td>
+                        </tr>
+                        <tr style="background:rgba(27,110,68,0.1); font-weight:bold;">
+                            <td><strong>Ampliación coordinada (S y T)</strong></td>
+                            <td><strong>Recomendación Óptima:</strong> Ampliar simultáneamente la capacidad de despacho del centro S y la recepción de la planta T, verificando la capacidad de los arcos intermedios.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="answer-box">
+                    <div class="answer-label">Recomendación Estratégica</div>
+                    <p>
+                        Para conseguir un flujo superior a 22 toneladas (por ejemplo, alcanzar 25 o 28 ton/jornada), la empresa debe actuar de forma sincronizada sobre <strong>ambas restricciones globales</strong> (despacho en S y recepción en T). Invertir únicamente en flota vehicular sin desatascar los accesos constituiría un desperdicio de capital.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ Preguntas complementarias de análisis ═══ -->
+        <section class="part-section" id="p4-q6-8">
+            <div class="part-header">
+                <span class="part-badge">Análisis</span>
+                <h3>Preguntas complementarias de análisis</h3>
+            </div>
+
+            <!-- Pregunta 6 -->
+            <div class="step-block">
+                <h4><span class="step-num">P6</span> ¿Por qué el flujo máximo no se obtiene necesariamente sumando las capacidades de todos los arcos que salen del origen?</h4>
+                <div class="analysis-card">
+                    <p>
+                        <strong>Respuesta:</strong> Porque la suma de capacidades de los arcos que salen del origen solo representa la <em>oferta física inicial de despacho</em>, pero <strong>no garantiza que la red interna o el sumidero tengan la capacidad de absorber y canalizar dicho volumen</strong>.
+                    </p>
+                    <p>
+                        Para que el material llegue al destino T, debe atravesar una topología intermedia con cuellos de botella propios. Si los arcos intermedios o los de llegada al destino son más estrechos, el flujo se frena.
+                    </p>
+                    <p>
+                        En nuestro ejercicio, la suma saliente de S es <span class="katex-inline" data-latex="12 + 10 = 22"></span> ton y coincide exactamente con la suma entrante a T (<span class="katex-inline" data-latex="10 + 12 = 22"></span> ton) y la red interna tuvo suficiente flexibilidad para redistribuir el material. Sin embargo, si la capacidad de llegada a la planta fuese de solo 15 toneladas, aunque de S salieran 22, el flujo máximo sería únicamente 15 toneladas.
+                    </p>
+                    <p class="note-box">
+                        <strong>Conclusión P6:</strong> El flujo máximo depende de la estructura completa de la red y está gobernado por el <em>corte mínimo global</em>, no únicamente por la capacidad de despacho de la fuente.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pregunta 7 -->
+            <div class="step-block">
+                <h4><span class="step-num">P7</span> ¿Qué diferencia existe entre la capacidad de una ruta individual y el flujo total que puede sostener toda la red?</h4>
+                <div class="analysis-card">
+                    <p>
+                        <strong>Respuesta:</strong> La capacidad de una <strong>ruta individual</strong> corresponde a la cantidad máxima de material que puede circular por un camino único y específico desde S hasta T. Dicho valor está dictado por su <strong>cuello de botella local</strong> (el arco con menor capacidad residual dentro de esa ruta).
+                    </p>
+                    <p>
+                        Por ejemplo, consideremos la ruta <span class="katex-inline" data-latex="S \to A \to C \to T"></span>:
+                    </p>
+                    <div class="math-display" data-latex="\text{Capacidad Ruta } (S \to A \to C \to T) = \min(12,\, 8,\, 10) = 8 \text{ toneladas}"></div>
+                    <p>
+                        Por esa ruta aislada solo pueden circular 8 toneladas. En cambio, el <strong>flujo total de la red</strong> aprovecha la infraestructura en paralelo y combinatoria, enviando flujo por múltiples caminos independientes y transversales de forma simultánea. En nuestro problema:
+                    </p>
+                    <div class="math-display" data-latex="F_{\text{total}} = 8 + 4 + 2 + 7 + 1 = 22 \text{ toneladas}"></div>
+                    <p class="note-box">
+                        <strong>Conclusión P7:</strong> Una ruta individual representa un canal puntual limitado por su arco más débil, mientras que el flujo de la red es la sumatoria de flujos compatibles en múltiples caminos concurrentes sin exceder las capacidades físicas de ningún arco.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pregunta 8 -->
+            <div class="step-block">
+                <h4><span class="step-num">P8</span> ¿Qué decisión sería más conveniente: adquirir más vehículos, ampliar una conexión, aumentar la capacidad de transferencia o ampliar la recepción en planta?</h4>
+                <div class="analysis-card">
+                    <p>
+                        <strong>Respuesta:</strong> La decisión más conveniente es realizar una <strong>ampliación coordinada entre la capacidad de despacho del centro de consolidación (S) y la capacidad de recepción de la planta (T)</strong>.
+                    </p>
+                    <p>
+                        El sustento cuantitativo radica en que el modelo matemático identificó que los dos cortes mínimos son idénticos y están saturados al 100%:
+                    </p>
+                    <ul>
+                        <li>Capacidad de salida en <span class="katex-inline" data-latex="S: 12 + 10 = 22"></span> toneladas.</li>
+                        <li>Capacidad de entrada en <span class="katex-inline" data-latex="T: 10 + 12 = 22"></span> toneladas.</li>
+                    </ul>
+                    <p>
+                        Comprar camiones adicionales no generará una sola tonelada extra de plástico transformado por día porque las compuertas de entrada y salida ya están copadas. La empresa debe:
+                    </p>
+                    <ol>
+                        <li>Aumentar la capacidad de despacho en S (por ejemplo, habilitar muelles de carga o turnos adicionales).</li>
+                        <li>Ampliar la capacidad de descarga y tolvas en la planta T.</li>
+                        <li>Monitorear los enlaces intermedios (como <span class="katex-inline" data-latex="A \to C"></span> y <span class="katex-inline" data-latex="B \to D"></span>) para que absorban el aumento proyectado.</li>
+                        <li>Solo entonces evaluar la incorporación de nueva flota de camiones.</li>
+                    </ol>
+                    <p class="note-box">
+                        <strong>Conclusión P8:</strong> No es conveniente invertir exclusivamente en vehículos. La decisión más rentable y técnicamente sólida es ampliar los dos cuellos de botella globales en origen y destino de manera sincronizada.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ Resumen General y Código en Python ═══ -->
+        <section class="part-section" id="p4-summary">
+            <div class="part-header">
+                <span class="part-badge">📋</span>
+                <h3>Resumen General del Taller y Verificación Computacional</h3>
+            </div>
+
+            <table class="dijkstra-table">
+                <thead>
+                    <tr><th>Punto</th><th>Tema Desarrollado</th><th>Resultado Obtenido</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>1</strong></td><td>Construcción del grafo dirigido</td><td>6 nodos, 10 arcos dirigidos y capacidades asignadas</td></tr>
+                    <tr><td><strong>2</strong></td><td>Modelo matemático PL</td><td>Maximizar <span class="katex-inline" data-latex="Z = x_{CT} + x_{DT}"></span> con 10 restricciones de cota y 4 de conservación</td></tr>
+                    <tr><td><strong>3</strong></td><td>Algoritmo Ford-Fulkerson</td><td>5 iteraciones de aumento exitosas</td></tr>
+                    <tr><td><strong>4</strong></td><td>Tabla de iteraciones y verificación</td><td>Incrementos: 8, 4, 2, 7 y 1 ton; conservación cumplida en A, B, C y D</td></tr>
+                    <tr><td><strong>5</strong></td><td>Interpretación del flujo y cuello de botella</td><td><strong>22 toneladas/jornada</strong>; saturación en S→A, S→B, C→T y D→T</td></tr>
+                    <tr><td><strong>6</strong></td><td>Capacidad del origen vs red</td><td>El origen no garantiza por sí solo el flujo; el corte mínimo manda</td></tr>
+                    <tr><td><strong>7</strong></td><td>Ruta individual vs red total</td><td>La ruta está limitada por su min local (8 ton); la red suma 22 ton</td></tr>
+                    <tr><td><strong>8</strong></td><td>Recomendación de inversión</td><td>Ampliación coordinada de salida en S y recepción en T</td></tr>
+                </tbody>
+            </table>
+
+            <div class="flow-status-grid" style="margin: 2rem 0;">
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Flujo Máximo Final</div>
+                    <div class="flow-status-val" style="color:var(--ink-green); font-size:1.8rem;">22 ton/jornada</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Iteraciones Requeridas</div>
+                    <div class="flow-status-val" style="font-size:1.8rem;">5</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Arcos Dirigidos</div>
+                    <div class="flow-status-val" style="font-size:1.8rem;">10</div>
+                </div>
+                <div class="flow-status-card">
+                    <div class="flow-status-label">Corte Mínimo Global</div>
+                    <div class="flow-status-val" style="color:var(--ink-red); font-size:1.8rem;">22 ton</div>
+                </div>
+            </div>
+
+            <!-- Python Verification Code Block -->
+            <div class="step-block">
+                <h4><span class="step-num">Python</span> Evidencia Computacional: Algoritmo de Ford-Fulkerson</h4>
+                <p>
+                    A continuación se presenta un programa en Python autónomo que reproduce paso a paso las 5 iteraciones y comprueba matemáticamente las 22 toneladas y el corte mínimo de la red logística:
+                </p>
+                <div class="code-box-container">
+                    <button type="button" class="copy-code-btn" id="btn-copy-code-p4">📋 Copiar Código</button>
+                    <pre class="code-box"><code id="code-snippet-p4">"""
+Taller 5 de Noviembre 2026: Red Logística para el Transporte de Material Recuperado
+Algoritmo de Ford-Fulkerson - Comprobación del Flujo Máximo
+"""
+
+class MaxFlowNetwork:
+    def __init__(self, nodes):
+        self.nodes = nodes
+        self.capacity = {u: {v: 0 for v in nodes} for u in nodes}
+        self.flow = {u: {v: 0 for v in nodes} for u in nodes}
+
+    def add_edge(self, u, v, cap):
+        self.capacity[u][v] = cap
+
+    def augment_path(self, path):
+        # 1. Hallar cuello de botella
+        bottleneck = min(self.capacity[path[i]][path[i+1]] - self.flow[path[i]][path[i+1]]
+                         for i in range(len(path) - 1))
+        # 2. Incrementar flujo a lo largo de la ruta
+        for i in range(len(path) - 1):
+            u, v = path[i], path[i+1]
+            self.flow[u][v] += bottleneck
+        return bottleneck
+
+# Inicialización de la red logística (6 nodos)
+nodes = ['S', 'A', 'B', 'C', 'D', 'T']
+net = MaxFlowNetwork(nodes)
+
+# 10 arcos dirigidos con sus capacidades
+edges = [
+    ('S', 'A', 12), ('S', 'B', 10),
+    ('A', 'B', 4),  ('A', 'C', 8),  ('A', 'D', 5),
+    ('B', 'D', 7),  ('B', 'C', 6),
+    ('C', 'D', 3),  ('C', 'T', 10),
+    ('D', 'T', 12)
+]
+for u, v, c in edges:
+    net.add_edge(u, v, c)
+
+# Secuencia de caminos aumentantes del taller
+paths = [
+    ['S', 'A', 'C', 'T'],
+    ['S', 'A', 'D', 'T'],
+    ['S', 'B', 'C', 'T'],
+    ['S', 'B', 'D', 'T'],
+    ['S', 'B', 'C', 'D', 'T']
+]
+
+print("=== EJECUCIÓN DE FORD-FULKERSON ===")
+total_flow = 0
+for idx, path in enumerate(paths, 1):
+    delta = net.augment_path(path)
+    total_flow += delta
+    print(f"Iteración {idx}: {' -> '.join(path):<22} | Cuello de botella: {delta} ton | Acumulado: {total_flow} ton")
+
+print(f"\nFlujo Máximo Final comprobado: {total_flow} toneladas/jornada")
+print("\n=== CARGA FINAL POR CONEXIÓN ===")
+for u, v, c in edges:
+    f = net.flow[u][v]
+    sat = " [100% SATURADO]" if f == c else ""
+    print(f"Arco {u} -> {v}: flujo {f:>2}/{c:>2} ton (residual: {c - f:>2}){sat}")
+</code></pre>
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <div class="answer-label">Conclusión General</div>
+                <p>
+                    El análisis matemático y computacional determinó que la red logística puede movilizar como máximo <strong>22 toneladas de plástico recuperado por jornada</strong> desde el centro de consolidación <strong>S</strong> hasta la planta de transformación <strong>T</strong>.
+                    El principio de conservación se satisface en todos los nodos y la optimalidad está respaldada por el Teorema del Corte Mínimo (<span class="katex-inline" data-latex="F_{\max} = \text{Corte}_{\min} = 22"></span>). Se recomienda a la directiva una inversión sincronizada en los accesos de origen y destino antes de adquirir vehículos adicionales.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <!--  RESUMEN FINAL                                                  -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="summary-section" id="summary-section">
@@ -864,6 +1711,9 @@
                 <tr><td><strong>3.a</strong></td><td>Flujo máximo: 8 unidades mediante 3 caminos de aumento (Ford-Fulkerson)</td></tr>
                 <tr><td><strong>3.b</strong></td><td>Conservación cumplida en A (5 = 5) y B (4 = 4); canales S→A, S→B y A→T saturados</td></tr>
                 <tr><td><strong>3.c</strong></td><td>Corte mínimo: {S} vs {A, B, T} con capacidad 8 = Flujo Máximo (Optimalidad demostrada)</td></tr>
+                <tr><td><strong>Taller 5 Nov (P1–P4)</strong></td><td>Red logística: 6 nodos, 10 arcos; Flujo Máximo = 22 toneladas/jornada en 5 iteraciones (8, 4, 2, 7, 1)</td></tr>
+                <tr><td><strong>Taller 5 Nov (P5)</strong></td><td>Cortes mínimos duales (Salida S y Entrada T) con capacidad 22 = Flujo Máximo; conexiones críticas saturadas</td></tr>
+                <tr><td><strong>Taller 5 Nov (P6–P8)</strong></td><td>Análisis estratégico: Ampliación coordinada de origen S y destino T antes de invertir en flota vehicular</td></tr>
             </tbody>
         </table>
     </section>

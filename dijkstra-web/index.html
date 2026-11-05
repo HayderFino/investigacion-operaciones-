@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dijkstra: Cuaderno de Investigación de Operaciones</title>
     <link rel="icon" href="data:,">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="vendor/katex/dist/katex.min.css">
     <script defer src="vendor/katex/dist/katex.min.js"></script>
     <script defer src="vendor/katex/dist/contrib/auto-render.min.js"></script>
-    
+
     <script>
         window.addEventListener('load', () => {
             if (typeof katex === 'undefined') {
@@ -24,9 +27,12 @@
 
     <link rel="stylesheet" href="styles/main.css">
 </head>
+
 <body>
-    <div id="global-error" class="tie-breaker-note" style="display:none; position:fixed; top:0; left:0; width:100%; z-index:9999; padding:10px; background-color: var(--ink-red); color: white;"></div>
-    
+    <div id="global-error" class="tie-breaker-note"
+        style="display:none; position:fixed; top:0; left:0; width:100%; z-index:9999; padding:10px; background-color: var(--ink-red); color: white;">
+    </div>
+
     <nav class="algo-mode-nav">
         <button type="button" class="mode-tab active" id="btn-mode-dijkstra">
             <span class="mode-icon">📍</span>
@@ -40,11 +46,19 @@
         </button>
     </nav>
 
-    <div style="max-width:1400px; margin:0 auto 1rem auto; text-align:center;">
-        <a href="ejercicios.html" style="font-family:var(--font-mono); font-size:0.9rem; color:var(--ink-dark); background:rgba(201,138,27,0.15); border:2px solid var(--ink-ochre); padding:0.5rem 1.25rem; text-decoration:none; display:inline-block; transition:all 0.2s;"
-           onmouseover="this.style.background='var(--ink-ochre)';this.style.color='white'"
-           onmouseout="this.style.background='rgba(201,138,27,0.15)';this.style.color='var(--ink-dark)'">
+    <div
+        style="max-width:1400px; margin:0 auto 1rem auto; text-align:center; display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap;">
+        <a href="ejercicios.html"
+            style="font-family:var(--font-mono); font-size:0.9rem; color:var(--ink-dark); background:rgba(201,138,27,0.15); border:2px solid var(--ink-ochre); padding:0.5rem 1.25rem; text-decoration:none; display:inline-block; transition:all 0.2s;"
+            onmouseover="this.style.background='var(--ink-ochre)';this.style.color='white'"
+            onmouseout="this.style.background='rgba(201,138,27,0.15)';this.style.color='var(--ink-dark)'">
             📝 Ver Ejercicios del Quiz (Kruskal + Dijkstra + Ford-Fulkerson)
+        </a>
+        <a href="ejercicios.html?prob=4"
+            style="font-family:var(--font-mono); font-size:0.9rem; color:white; background:var(--ink-green); border:2px solid var(--ink-green); padding:0.5rem 1.25rem; text-decoration:none; display:inline-block; transition:all 0.2s; box-shadow: 2px 2px 0 rgba(31, 46, 90, 0.2);"
+            onmouseover="this.style.background='var(--ink-dark)';this.style.borderColor='var(--ink-dark)'"
+            onmouseout="this.style.background='var(--ink-green)';this.style.borderColor='var(--ink-green)'">
+            🚛 Taller 5 de Noviembre 2026: Flujo Máximo (Red Logística)
         </a>
     </div>
 
@@ -66,9 +80,12 @@
         </div>
 
         <div class="exercise-statement-box" id="exercise-box">
-            <h3 class="exercise-statement-title" id="ex-title">Ejercicio 1: Ejemplo 6.3-1 (Red de Distribución Ponderada)</h3>
+            <h3 class="exercise-statement-title" id="ex-title">Ejercicio 1: Ejemplo 6.3-1 (Red de Distribución
+                Ponderada)</h3>
             <p class="exercise-statement-desc" id="ex-desc">
-                Determinar la ruta más corta desde el nodo origen <strong>1</strong> hasta el nodo destino <strong>11</strong> a través de la red mixta ponderada, calculando las distancias acumuladas mínimas y el conjunto de predecesores de cada nodo.
+                Determinar la ruta más corta desde el nodo origen <strong>1</strong> hasta el nodo destino
+                <strong>11</strong> a través de la red mixta ponderada, calculando las distancias acumuladas mínimas y
+                el conjunto de predecesores de cada nodo.
             </p>
             <div class="exercise-statement-meta" id="ex-meta">
                 <span class="meta-pill"><strong>Origen:</strong> Nodo 1</span>
@@ -84,33 +101,33 @@
             <div class="graph-container">
                 <svg id="graph-svg" width="100%" height="560"></svg>
             </div>
-            
+
             <div class="controls-panel">
                 <h3>Configuración de la Red</h3>
-                
+
                 <div id="error-message" class="tie-breaker-note" style="display:none; margin-bottom:1rem;"></div>
 
                 <div class="config-grid">
-                    <label>Nodos (2-30): 
+                    <label>Nodos (2-30):
                         <input type="number" id="node-count" min="2" max="30">
                     </label>
-                    <label>Tipo: 
+                    <label>Tipo:
                         <select id="graph-type">
                             <option value="directed">Dirigido</option>
                             <option value="undirected">No dirigido</option>
                         </select>
                     </label>
-                    <label id="lbl-start-node">Origen: 
+                    <label id="lbl-start-node">Origen:
                         <select id="start-node"></select>
                     </label>
-                    <label id="lbl-end-node">Destino: 
+                    <label id="lbl-end-node">Destino:
                         <select id="end-node"></select>
                     </label>
                 </div>
 
                 <h4>Agregar Conexión</h4>
                 <div class="edge-form">
-                    <select id="edge-u"></select> 
+                    <select id="edge-u"></select>
                     <select id="edge-dir" style="width: auto;">
                         <option value="forward">→</option>
                         <option value="both">↔</option>
@@ -124,7 +141,13 @@
                 <h4>Conexiones Actuales</h4>
                 <table class="dijkstra-table" id="edges-table">
                     <thead>
-                        <tr><th>Desde</th><th>Dir</th><th>Hasta</th><th>Peso</th><th>Acción</th></tr>
+                        <tr>
+                            <th>Desde</th>
+                            <th>Dir</th>
+                            <th>Hasta</th>
+                            <th>Peso</th>
+                            <th>Acción</th>
+                        </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -132,10 +155,12 @@
                 <div class="button-group" style="margin-top:1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
                     <button id="btn-example" class="btn-dijkstra-only">Cargar Ejercicio 1</button>
                     <button id="btn-example-3jugs" class="btn-dijkstra-only">Cargar Ejercicio 2</button>
-                    <button id="btn-example-kruskal" class="btn-kruskal-only" style="display:none;">Cargar Ejemplo Kruskal (6 Nodos)</button>
+                    <button id="btn-example-kruskal" class="btn-kruskal-only" style="display:none;">Cargar Ejemplo
+                        Kruskal (6 Nodos)</button>
                     <button id="btn-clear">Limpiar Red</button>
                     <button id="btn-start" class="primary btn-dijkstra-only">Resolver con Dijkstra</button>
-                    <button id="btn-start-kruskal" class="primary btn-kruskal-only" style="display:none;">Resolver con Kruskal</button>
+                    <button id="btn-start-kruskal" class="primary btn-kruskal-only" style="display:none;">Resolver con
+                        Kruskal</button>
                 </div>
 
                 <div class="step-controls" id="step-controls" style="display: none; margin-top:1rem;">
@@ -162,12 +187,18 @@
 
             <!-- Kruskal Flowchart / Rule Box -->
             <div class="formula-box" id="kruskal-formula-box" style="display: none;">
-                <div class="math-eq" data-latex="\text{Find}(u) \neq \text{Find}(v) \implies T \leftarrow T \cup \{(u, v)\}, \quad \text{Union}(u, v)"></div>
+                <div class="math-eq"
+                    data-latex="\text{Find}(u) \neq \text{Find}(v) \implies T \leftarrow T \cup \{(u, v)\}, \quad \text{Union}(u, v)">
+                </div>
                 <ul class="explanation">
-                    <li><strong>1. Ordenar aristas:</strong> $w(e_1) \le w(e_2) \le \dots \le w(e_m)$ de menor a mayor peso.</li>
-                    <li><strong>2. Find con compresión:</strong> calcula el representante de la componente conexa de $u$ y de $v$.</li>
-                    <li><strong>3. Representantes diferentes:</strong> los nodos están en componentes separadas. Se añade $(u, v)$ al árbol $T$ y se aplica $\text{Union}(u, v)$ por rango.</li>
-                    <li><strong>4. Representantes iguales:</strong> se <em>descarta</em> la arista porque formaría un ciclo cerrado.</li>
+                    <li><strong>1. Ordenar aristas:</strong> $w(e_1) \le w(e_2) \le \dots \le w(e_m)$ de menor a mayor
+                        peso.</li>
+                    <li><strong>2. Find con compresión:</strong> calcula el representante de la componente conexa de $u$
+                        y de $v$.</li>
+                    <li><strong>3. Representantes diferentes:</strong> los nodos están en componentes separadas. Se
+                        añade $(u, v)$ al árbol $T$ y se aplica $\text{Union}(u, v)$ por rango.</li>
+                    <li><strong>4. Representantes iguales:</strong> se <em>descarta</em> la arista porque formaría un
+                        ciclo cerrado.</li>
                     <li><strong>5. Condición de parada:</strong> $|T| = |V| - 1$ aristas o aristas agotadas.</li>
                 </ul>
             </div>
@@ -183,4 +214,5 @@
 
     <script type="module" src="src/app.js"></script>
 </body>
+
 </html>
